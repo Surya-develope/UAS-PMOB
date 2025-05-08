@@ -3,6 +3,7 @@ BrainQuizz: Aplikasi Kuis Berdasarkan Quizziz
 BrainQuizz adalah aplikasi kuis yang interaktif dan menyenangkan, dirancang untuk memberikan pengalaman belajar yang dinamis. Terinspirasi oleh platform kuis populer seperti Quizziz, BrainQuizz bertujuan untuk membantu siswa, pendidik, dan penggemar pengetahuan menguji pemahaman mereka dalam berbagai mata pelajaran sambil menawarkan lingkungan yang menyenangkan dan kompetitif.
 
 Fitur Utama:
+    
     1) Pendaftaran Pengguna dan Autentikasi:
        
     2) Pengguna dapat mendaftar dan masuk ke dalam sistem. Setiap pengguna memiliki detail unik seperti nama pengguna, email, dan hash kata sandi untuk akses yang aman.
@@ -39,7 +40,7 @@ Panel Admin dan Manajemen:
 
 Gambaran Umum Struktur Database:
 
-    ![339c2675-aeda-4cc4-acd6-ecbd04add8a3](https://github.com/user-attachments/assets/5af6d057-ed50-4346-89a5-dddd4a2ec9ec)
+    https://github.com/user-attachments/assets/5af6d057-ed50-4346-89a5-dddd4a2ec9ec
 
 
     1. Skema database aplikasi mendukung entitas berikut:
