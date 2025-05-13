@@ -1,4 +1,0 @@
-// File: build.gradle (Project-level)
-plugins {
-    alias(libs.plugins.android.application) apply false
-}

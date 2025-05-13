@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "QuizzApp"
-include ':app'
+rootProject.name = "BrainQuiz"
+include(":app")
