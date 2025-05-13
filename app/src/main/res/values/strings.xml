@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">BrainQuiz</string>
+
+    <!-- Define the roles for the spinner -->
+    <string-array name="role_array">
+        <item>student</item>
+        <item>teacher</item>
+        <item>admin</item>
+    </string-array>
 </resources>
