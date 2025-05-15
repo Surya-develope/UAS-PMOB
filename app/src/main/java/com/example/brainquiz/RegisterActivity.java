@@ -1,9 +1,11 @@
 package com.example.brainquiz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ArrayAdapter;
 
@@ -20,6 +22,7 @@ import retrofit2.Response;
 public class RegisterActivity extends AppCompatActivity {
 
     private EditText nameEditText, emailEditText, passwordEditText;
+    private TextView tvToLogin;
     private Spinner roleSpinner; // Declare Spinner
     private Button registerButton;
 
@@ -34,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.etPassword);
         roleSpinner = findViewById(R.id.spinnerRole); // Initialize Spinner
         registerButton = findViewById(R.id.btnRegister);
+        tvToLogin = findViewById(R.id.tvToLogin);
 
         // Set up the Spinner with role options
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,

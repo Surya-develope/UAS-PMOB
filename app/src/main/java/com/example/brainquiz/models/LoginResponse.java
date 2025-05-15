@@ -1,8 +1,22 @@
 package com.example.brainquiz.models;
 
 public class LoginResponse {
+
     private boolean success;
-    private String token;
+    private String message;
+    private Data data;
+
+    public static class Data {
+        private String token;
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+    }
 
     // Getters and Setters
     public boolean isSuccess() {
@@ -13,11 +27,19 @@ public class LoginResponse {
         this.success = success;
     }
 
-    public String getToken() {
-        return token;
+    public String getMessage() {
+        return message;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
     }
 }
