@@ -17,7 +17,7 @@ public interface ApiService {
     @POST("user/register")
     Call<User> register(@Body User user);
 
-    @GET("/user/login")
+    @POST("/user/login")
     Call<ResponseBody> login(String email, String password);
     // Get user info with the Authorization header
     @GET("user/get-user")

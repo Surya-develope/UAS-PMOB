@@ -42,6 +42,8 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.android.volley:volley:1.2.1")
+
 
     // OkHttp for better HTTP handling
     implementation("com.squareup.okhttp3:okhttp:4.9.1")
