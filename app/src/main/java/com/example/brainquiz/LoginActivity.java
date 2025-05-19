@@ -1,6 +1,7 @@
 package com.example.brainquiz;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,11 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,28 +89,41 @@ public class LoginActivity extends AppCompatActivity {
         StringRequest request = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                Log.d("LoginResponse", "Raw Response: " + response);
+
                 try {
+                    // Parse respons JSON
                     JSONObject jsonResponse = new JSONObject(response);
 
-                    // Check if the response is successful
+                    // Cek apakah login berhasil
                     boolean success = jsonResponse.getBoolean("success");
                     String message = jsonResponse.getString("message");
 
                     if (success) {
-                        // Handle successful login
+                        // Ambil data dari objek "data" yang berisi token
+                        JSONObject data = jsonResponse.getJSONObject("data");
+                        String token = data.getString("token");
+
+                        // Menyimpan token ke SharedPreferences
+                        saveToken(token);
+
+                        // Log token untuk debugging
+                        Log.d("LoginResponse", "Token: " + token);  // Periksa token yang disimpan
+
+                        // Menangani login sukses
                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
 
-                        // Redirect to HomeActivity after successful login
+                        // Redirect ke HomeActivity setelah login sukses
                         startActivity(new Intent(LoginActivity.this, HomeActivity.class));
 
-                        // Optionally, you can finish the current activity so that the user cannot go back to login after success
+                        // Opsional, Anda bisa menyelesaikan activity login agar pengguna tidak bisa kembali
                         finish();
                     } else {
-                        // Handle failed login
+                        // Menangani login gagal
                         Toast.makeText(LoginActivity.this, "Login Failed: " + message, Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
-                    // Handle JSON parsing error
+                    // Menangani kesalahan parsing JSON
                     e.printStackTrace();
                     Toast.makeText(LoginActivity.this, "Error parsing response", Toast.LENGTH_SHORT).show();
                 }
@@ -136,4 +153,14 @@ public class LoginActivity extends AppCompatActivity {
         // Add the request to the Volley request queue
         AppSingleton.getInstance(this).addToRequestQueue(request);
     }
+
+    // Menyimpan token setelah login berhasil
+    private void saveToken(String token) {
+        Log.d("saveToken", "Token disimpan: " + token);
+        SharedPreferences sharedPreferences = getSharedPreferences("MyApp", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("token", token);
+        editor.apply();
+    }
+
 }

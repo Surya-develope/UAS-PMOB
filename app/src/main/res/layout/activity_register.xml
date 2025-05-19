@@ -1,120 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF">
+    android:background="#A7D7C5"> <!-- Warna toska muda -->
 
-    <LinearLayout
+    <!-- Logo di pojok kiri atas -->
+    <ImageView
+        android:id="@+id/quizLogo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/quiz_logo"
+        android:layout_margin="16dp"
+        android:layout_gravity="start|top" />
+
+    <!-- Kotak putih tengah -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="24dp"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:clipToPadding="false"
+        android:layout_gravity="center">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Register"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#2196F3"
-            android:layout_marginBottom="24dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Username"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="4dp" />
-
-        <EditText
-            android:id="@+id/etUsername"
-            android:hint="Masukkan username"
-            android:background="@drawable/edittext_background"
-            android:padding="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Email"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="4dp" />
-
-        <EditText
-            android:id="@+id/etEmail"
-            android:hint="Masukkan email"
-            android:inputType="textEmailAddress"
-            android:background="@drawable/edittext_background"
-            android:padding="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Password"
-            android:textStyle="bold"
-            android:textColor="#000000"
-            android:layout_marginBottom="4dp" />
-
-        <EditText
-            android:id="@+id/etPassword"
-            android:hint="Masukkan password"
-            android:inputType="textPassword"
-            android:background="@drawable/edittext_background"
-            android:padding="12dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp" />
-
-        <Spinner
-            android:id="@+id/spinnerRole"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/btnRegister"
-            android:text="Daftar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#2196F3"
-            android:textColor="#FFFFFF"
-            android:padding="12dp"
-            android:layout_marginBottom="16dp" />
-
-
-
-
-        <!-- Baris horizontal untuk teks bawah -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_gravity="center"
+            android:layout_margin="30dp"
+            android:background="@drawable/rounded_box"
+            android:backgroundTint="#FFFFFF"
+            android:backgroundTintMode="src_over"
+            android:clipToPadding="false"
+            android:elevation="4dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="30dp">
 
+            <!-- Judul Register (center) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sudah punya akun? "
-                android:textColor="#000000" />
-
-            <TextView
-                android:id="@+id/tvToLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Login Sekarang"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:text="Register"
                 android:textColor="#2196F3"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
+                android:textSize="28sp"
+                android:textStyle="bold" />
 
-    </LinearLayout>
-</ScrollView>
+            <!-- Label & Input Username -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Username"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etUsername"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edittext_background"
+                android:padding="12dp"
+                android:textColor="#000000"
+                android:textColorHint="#888888" />
+
+            <!-- Label & Input Email -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Email"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/edittext_background"
+                android:inputType="textEmailAddress"
+                android:padding="12dp"
+                android:textColor="#000000"
+                android:textColorHint="#888888" />
+
+            <!-- Label & Input Password -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Password"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/edittext_background"
+                android:inputType="textPassword"
+                android:padding="12dp"
+                android:textColor="#000000"
+                android:textColorHint="#888888" />
+
+            <Spinner
+                android:id="@+id/spinnerRole"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Tombol Register -->
+            <Button
+                android:id="@+id/btnRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:backgroundTint="#2196F3"
+                android:padding="12dp"
+                android:text="Daftar"
+                android:textColor="#FFFFFF" />
+
+            <!-- Teks "Sudah punya akun?" center -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sudah punya akun? "
+                    android:textColor="#000000" />
+
+                <TextView
+                    android:id="@+id/tvToLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Login Sekarang"
+                    android:textColor="#2196F3"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
