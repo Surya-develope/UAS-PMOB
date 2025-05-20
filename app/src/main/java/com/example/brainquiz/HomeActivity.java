@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -61,7 +62,8 @@ public class HomeActivity extends AppCompatActivity {
         apiService = retrofit.create(ApiService.class);
 
         // Event Listener
-        menuTingkatan.setOnClickListener(v -> fetchTingkatan());
+        menuTingkatan.setOnClickListener(v -> startActivity(new Intent(this, TingkatanActivity.class)));
+        menuKategori.setOnClickListener(v -> startActivity(new Intent(this, KategoriActivity.class)));
         menuKuis.setOnClickListener(v -> showToast("Menu Kuis diklik"));
         menuSoal.setOnClickListener(v -> showToast("Menu Soal diklik"));
         menuJawabSoal.setOnClickListener(v -> showToast("Menu Jawab Soal diklik"));

@@ -21,6 +21,13 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
+            android:name=".TingkatanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".KategoriActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

@@ -7,6 +7,7 @@ import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.filter.Tingkatan;
 import com.example.brainquiz.models.User;
+import com.example.brainquiz.KategoriResponse;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public interface ApiService {
     Call<List<Pendidikan>> getPendidikan();
 
     @GET("kategori/get-kategori")
-    Call<List<Kategori>> getKategori();
+    Call<KategoriResponse> getKategori(@Header("Authorization") String token);
 
     @GET("kelas/get-kelas")
     Call<List<Kelas>> getKelas();

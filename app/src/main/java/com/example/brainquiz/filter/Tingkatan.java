@@ -6,11 +6,11 @@ public class Tingkatan {
     private String description;
 
     // Getters and Setters
-    public String getName() {
+    public String getNama() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setNama(String name) {
         this.name = name;
     }
 

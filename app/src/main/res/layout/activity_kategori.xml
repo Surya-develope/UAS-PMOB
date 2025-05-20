@@ -61,8 +61,8 @@
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
-        <!-- Grid Kategori -->
         <GridLayout
+            android:id="@+id/gridKategori"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
@@ -70,6 +70,7 @@
             android:columnCount="2"
             android:rowCount="3"
             android:useDefaultMargins="true">
+            <!-- isi elemen GridLayout -->
 
             <!-- ===== Kategori 1 ===== -->
             <LinearLayout
