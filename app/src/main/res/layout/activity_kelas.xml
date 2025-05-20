@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -42,6 +43,7 @@
 
         <!-- Search bar -->
         <EditText
+            android:id="@+id/searchBar"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Search"
@@ -55,6 +57,7 @@
 
         <!-- Tombol Tambah Tingkatan -->
         <Button
+            android:id="@+id/btnTambahTingkatan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -68,6 +71,7 @@
 
         <!-- Grid Kelas -->
         <GridLayout
+            android:id="@+id/gridLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:alignmentMode="alignMargins"

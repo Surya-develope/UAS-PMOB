@@ -59,8 +59,10 @@
             android:text="Tambah Tingkatan"
             android:textColor="#FFFFFF" />
 
+
         <!-- Grid Tingkatan -->
         <GridLayout
+            android:id="@+id/rvPendidikan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"

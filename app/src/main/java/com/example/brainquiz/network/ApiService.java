@@ -33,11 +33,12 @@ public interface ApiService {
     Call<TingkatanResponse> getTingkatan(@Header("Authorization") String token);
 
     @GET("pendidikan/get-pendidikan")
-    Call<List<Pendidikan>> getPendidikan();
+    Call<List<Pendidikan>> getPendidikan(@Header("Authorization") String token);
 
     @GET("kategori/get-kategori")
     Call<KategoriResponse> getKategori(@Header("Authorization") String token);
 
     @GET("kelas/get-kelas")
-    Call<List<Kelas>> getKelas();
+    Call<List<Kelas>> getKelas(@Header("Authorization") String token);
+
 }

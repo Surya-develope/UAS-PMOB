@@ -26,6 +26,12 @@
         <activity
             android:name=".KategoriActivity"
             android:exported="false" />
+        <activity
+            android:name=".KelasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".PendidikanActivity"
+            android:exported="false" />
 
         <activity
             android:name=".LoginActivity"
