@@ -1,11 +1,27 @@
 package com.example.brainquiz.filter;
 
+import com.google.gson.annotations.SerializedName;
 
 public class Kelas {
-    private int id;
+    @SerializedName("id")
+    private String id;
+
+    @SerializedName("nama")
     private String nama;
 
-    public int getId() { return id; }
-    public String getNama() { return nama; }
-}
+    public String getId() {
+        return id;
+    }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+}

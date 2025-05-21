@@ -8,6 +8,19 @@ public class KelasResponse {
     private boolean success;
     private List<Kelas> data;
 
-    public boolean isSuccess() { return success; }
-    public List<Kelas> getData() { return data; }
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public List<Kelas> getData() {
+        return data;
+    }
+
+    public void setData(List<Kelas> data) {
+        this.data = data;
+    }
 }

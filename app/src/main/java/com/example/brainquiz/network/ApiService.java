@@ -8,6 +8,7 @@ import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.filter.Tingkatan;
 import com.example.brainquiz.models.User;
 import com.example.brainquiz.KategoriResponse;
+import com.example.brainquiz.KelasResponse;
 
 import java.util.List;
 
