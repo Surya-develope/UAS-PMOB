@@ -1,20 +1,11 @@
 package com.example.brainquiz;
 
 import com.example.brainquiz.filter.Kelas;
-
 import java.util.List;
 
 public class KelasResponse {
-    private boolean success;
     private List<Kelas> data;
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
+    private int kelas;
 
     public List<Kelas> getData() {
         return data;
@@ -22,5 +13,13 @@ public class KelasResponse {
 
     public void setData(List<Kelas> data) {
         this.data = data;
+    }
+
+    public int getKelas() {
+        return kelas;
+    }
+
+    public void setKelas(int kelas) {
+        this.kelas = kelas;
     }
 }

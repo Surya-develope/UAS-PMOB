@@ -1,15 +1,71 @@
 package com.example.brainquiz.filter;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Pendidikan {
+    @SerializedName("id")
     private int id;
-    private String nama;  // contoh field sesuai API, sesuaikan ya
 
-    // getter
-    public int getId() { return id; }
-    public String getNama() { return nama; }
+    @SerializedName("createdAt")
+    private String createdAt;
 
-    // setter (opsional, kalau perlu)
-    public void setId(int id) { this.id = id; }
-    public void setNama(String nama) { this.nama = nama; }
+    @SerializedName("updatedAt")
+    private String updatedAt;
+
+    @SerializedName("deletedAt")
+    private String deletedAt;
+
+    @SerializedName("nama")
+    private String nama;
+
+    @SerializedName("deskripsi")
+    private String deskripsi;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(String deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public String getNama() {
+        return nama;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public String getDeskripsi() {
+        return deskripsi;
+    }
+
+    public void setDeskripsi(String deskripsi) {
+        this.deskripsi = deskripsi;
+    }
 }
-

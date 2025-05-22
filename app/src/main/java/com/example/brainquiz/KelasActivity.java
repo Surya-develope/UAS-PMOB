@@ -1,9 +1,9 @@
 package com.example.brainquiz;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,42 +28,37 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class KelasActivity extends AppCompatActivity {
 
-    private GridLayout gridKelas;
-    private EditText searchBar;
+    private GridLayout gridLayout;
     private Button btnTambahTingkatan;
+    private EditText searchBar;
+
     private ApiService apiService;
+    private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kelas);
 
-        // Hide action bar
         if (getSupportActionBar() != null) getSupportActionBar().hide();
 
-        // Initialize views
-        gridKelas = findViewById(R.id.gridLayout);
-        searchBar = findViewById(R.id.searchBar);
+        // --- inisialisasi view ---
+        gridLayout = findViewById(R.id.gridLayout);
         btnTambahTingkatan = findViewById(R.id.btnTambahTingkatan);
+        searchBar = findViewById(R.id.searchBar);
 
-        // Initialize Retrofit
+        // --- Retrofit ---
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://brainquiz0.up.railway.app/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
-        // Set up button click listener
-        btnTambahTingkatan.setOnClickListener(v -> Toast.makeText(this, "Tambah Kelas diklik", Toast.LENGTH_SHORT).show());
-
-        // Set up search bar listener (placeholder)
-        searchBar.setOnEditorActionListener((v, actionId, event) -> {
-            Toast.makeText(this, "Pencarian: " + searchBar.getText().toString(), Toast.LENGTH_SHORT).show();
-            return true;
-        });
-
-        // Fetch classes
+        // ambil data
         fetchKelas();
+
+        // klik listener
+        btnTambahTingkatan.setOnClickListener(v -> Toast.makeText(this, "Tambah Tingkatan diklik", Toast.LENGTH_SHORT).show());
     }
 
     private String getToken() {
@@ -78,71 +73,66 @@ public class KelasActivity extends AppCompatActivity {
             return;
         }
 
-        apiService.getKelas("Bearer " + token).enqueue(new Callback<List<Kelas>>() {
+        apiService.getKelas("Bearer " + token).enqueue(new Callback<KelasResponse>() {
             @Override
-            public void onResponse(Call<List<Kelas>> call, Response<List<Kelas>> response) {
+            public void onResponse(Call<KelasResponse> call, Response<KelasResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Kelas> kelasList = response.body();
-                    Toast.makeText(KelasActivity.this, "Dapat " + kelasList.size() + " kelas", Toast.LENGTH_SHORT).show();
-                    tampilkanKelas(kelasList);
+                    List<Kelas> data = response.body().getData();
+                    Toast.makeText(KelasActivity.this, "Dapat " + data.size() + " kelas", Toast.LENGTH_SHORT).show();
+                    bindDataToCards(data);
                 } else {
                     Log.e("KelasActivity", "Error " + response.code());
-                    Toast.makeText(KelasActivity.this, "Gagal mengambil data kelas", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(KelasActivity.this, "Gagal mengambil data: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Kelas>> call, Throwable t) {
-                Log.e("KelasActivity", "onFailure: " + t.getMessage());
+            public void onFailure(Call<KelasResponse> call, Throwable t) {
                 Toast.makeText(KelasActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("KelasActivity", "onFailure: ", t);
             }
         });
     }
 
-    private void tampilkanKelas(List<Kelas> kelasList) {
-        gridKelas.removeAllViews();
+    /** masukkan nama kelas ke GridLayout secara dinamis */
+    private void bindDataToCards(List<Kelas> list) {
+        // Bersihkan GridLayout sebelum menambahkan data baru
+        gridLayout.removeAllViews();
 
-        for (Kelas kelas : kelasList) {
+        for (Kelas kelas : list) {
+            // Buat LinearLayout untuk setiap kartu
             LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(Gravity.CENTER);
-            int paddingPx = (int) (16 * getResources().getDisplayMetrics().density);
-            card.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
-
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-            int marginPx = (int) (8 * getResources().getDisplayMetrics().density);
-            params.setMargins(marginPx, marginPx, marginPx, marginPx);
+            params.setMargins(8, 8, 8, 8);
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f); // 2 kolom dengan bobot 1
             card.setLayoutParams(params);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setGravity(LinearLayout.TEXT_ALIGNMENT_CENTER);
+            card.setPadding(16, 16, 16, 16);
+            card.setBackgroundResource(R.drawable.bg_card);
+            card.setElevation(4f);
 
-            // Icon
-            ImageView icon = new ImageView(this);
-            int sizePx = (int) (48 * getResources().getDisplayMetrics().density);
-            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(sizePx, sizePx);
-            icon.setLayoutParams(iconParams);
-            icon.setImageResource(R.drawable.ic_kelas); // Ensure this drawable exists
-            icon.setColorFilter(getResources().getColor(android.R.color.white));
-            card.addView(icon);
+            // Tambahkan ImageView
+            ImageView imageView = new ImageView(this);
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
+            imageView.setImageResource(R.drawable.kelas);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            card.addView(imageView);
 
-            // Class Name
-            TextView nama = new TextView(this);
-            LinearLayout.LayoutParams namaParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            namaParams.topMargin = (int) (8 * getResources().getDisplayMetrics().density);
-            nama.setLayoutParams(namaParams);
-            nama.setText(kelas.getNama());
-            nama.setTextColor(getResources().getColor(android.R.color.white));
-            nama.setTextSize(14);
-            card.addView(nama);
+            // Tambahkan TextView
+            TextView textView = new TextView(this);
+            textView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+            textView.setText(kelas.getNama());
+            textView.setTextColor(getResources().getColor(android.R.color.white));
+            textView.setTextSize(16);
+            textView.setTypeface(null, Typeface.BOLD); // Use Typeface.BOLD to set the text style to bold
+            textView.setPadding(0, 8, 0, 0); // Margin top 8dp seperti di XML
+            card.addView(textView);
 
-            // Add click listener for the card
-            card.setOnClickListener(v -> Toast.makeText(this, kelas.getNama() + " diklik", Toast.LENGTH_SHORT).show());
-
-            gridKelas.addView(card);
+            // Tambahkan kartu ke GridLayout
+            gridLayout.addView(card);
         }
     }
 }
