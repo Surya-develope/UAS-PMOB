@@ -4,7 +4,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.brainquiz.filter.Kelas;
+import com.example.brainquiz.KelasResponse;
 import com.example.brainquiz.network.ApiService;
 
 import java.util.List;
@@ -42,22 +43,18 @@ public class KelasActivity extends AppCompatActivity {
 
         if (getSupportActionBar() != null) getSupportActionBar().hide();
 
-        // --- inisialisasi view ---
         gridLayout = findViewById(R.id.gridLayout);
         btnTambahTingkatan = findViewById(R.id.btnTambahTingkatan);
         searchBar = findViewById(R.id.searchBar);
 
-        // --- Retrofit ---
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
-        // ambil data
         fetchKelas();
 
-        // klik listener
         btnTambahTingkatan.setOnClickListener(v -> Toast.makeText(this, "Tambah Tingkatan diklik", Toast.LENGTH_SHORT).show());
     }
 
@@ -94,44 +91,41 @@ public class KelasActivity extends AppCompatActivity {
         });
     }
 
-    /** masukkan nama kelas ke GridLayout secara dinamis */
     private void bindDataToCards(List<Kelas> list) {
-        // Bersihkan GridLayout sebelum menambahkan data baru
         gridLayout.removeAllViews();
 
         for (Kelas kelas : list) {
-            // Buat LinearLayout untuk setiap kartu
             LinearLayout card = new LinearLayout(this);
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.setMargins(8, 8, 8, 8);
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f); // 2 kolom dengan bobot 1
+            params.setMargins(16, 16, 16, 16);
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f);
             card.setLayoutParams(params);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(LinearLayout.TEXT_ALIGNMENT_CENTER);
-            card.setPadding(16, 16, 16, 16);
+            card.setGravity(Gravity.CENTER_HORIZONTAL);
+            card.setPadding(32, 32, 32, 32);
             card.setBackgroundResource(R.drawable.bg_card);
-            card.setElevation(4f);
+            card.setElevation(8f);
 
-            // Tambahkan ImageView
             ImageView imageView = new ImageView(this);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
+            imageView.setLayoutParams(new LinearLayout.LayoutParams(96, 96));
             imageView.setImageResource(R.drawable.kelas);
             imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             card.addView(imageView);
 
-            // Tambahkan TextView
             TextView textView = new TextView(this);
-            textView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-            textView.setText(kelas.getNama());
+            textView.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            textView.setText(kelas.getName());
             textView.setTextColor(getResources().getColor(android.R.color.white));
             textView.setTextSize(16);
-            textView.setTypeface(null, Typeface.BOLD); // Use Typeface.BOLD to set the text style to bold
-            textView.setPadding(0, 8, 0, 0); // Margin top 8dp seperti di XML
+            textView.setTypeface(null, Typeface.BOLD);
+            textView.setPadding(0, 12, 0, 0);
             card.addView(textView);
 
-            // Tambahkan kartu ke GridLayout
             gridLayout.addView(card);
         }
     }

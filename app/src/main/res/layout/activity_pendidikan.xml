@@ -1,16 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B2DFDB"
-    android:padding="16dp">
+    android:background="#B2DFDB">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <!-- Logo & Judul -->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,14 +24,12 @@
                 android:src="@drawable/quizz_logo"
                 android:contentDescription="Logo App" />
 
-            <!-- Spacer -->
             <View
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
 
             <TextView
-                android:id="@+id/tv_pendidikan_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Pendidikan"
@@ -40,165 +38,41 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Search Bar -->
+        <!-- Search -->
         <EditText
+            android:id="@+id/et_cari_pendidikan"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Search"
-            android:paddingHorizontal="16dp"
+            android:padding="12dp"
             android:background="@drawable/bg_search_field"
-            android:drawableStart="@android:drawable/ic_menu_search" />
+            android:drawableStart="@android:drawable/ic_menu_search"
+            android:drawablePadding="8dp" />
 
-        <!-- Tombol Tambah -->
+        <!-- Tombol tambah -->
         <Button
-            android:id="@+id/btnTambahTingkatan"
+            android:id="@+id/btn_tambah_pendidikan"
             android:layout_width="wrap_content"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="12dp"
             android:backgroundTint="#00796B"
-            android:text="Tambah Tingkatan"
-            android:textColor="#FFFFFF" />
+            android:text="Tambah Pendidikan"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:radius="16dp" />
 
-
-        <!-- Grid Tingkatan -->
+        <!-- Grid Pendidikan -->
         <GridLayout
-            android:id="@+id/rvPendidikan"
+            android:id="@+id/grid_pendidikan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:alignmentMode="alignMargins"
             android:columnCount="2"
-            android:columnOrderPreserved="false"
+            android:rowCount="2"
             android:useDefaultMargins="true">
-
-            <!-- SD -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#00796B"
-                card_view:cardCornerRadius="20dp"
-                card_view:cardElevation="6dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/pendidikan"
-                        android:tint="@android:color/white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="SD"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- SD (copy) -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#00796B"
-                card_view:cardCornerRadius="20dp"
-                card_view:cardElevation="6dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/pendidikan"
-                        android:tint="@android:color/white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="SD"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- SMP -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#00796B"
-                card_view:cardCornerRadius="20dp"
-                card_view:cardElevation="6dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/pendidikan"
-                        android:tint="@android:color/white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="SMP"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- SMA -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="120dp"
-                android:layout_columnWeight="1"
-                android:layout_margin="8dp"
-                android:backgroundTint="#00796B"
-                card_view:cardCornerRadius="20dp"
-                card_view:cardElevation="6dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/pendidikan"
-                        android:tint="@android:color/white" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="SMA"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+            <!-- Cards will be added dynamically -->
         </GridLayout>
     </LinearLayout>
 </ScrollView>

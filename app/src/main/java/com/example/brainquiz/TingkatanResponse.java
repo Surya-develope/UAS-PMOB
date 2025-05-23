@@ -8,7 +8,6 @@ public class TingkatanResponse {
     private String message;
     private boolean success;
 
-    // Getter & Setter
     public List<Tingkatan> getData() {
         return data;
     }

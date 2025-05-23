@@ -1,82 +1,58 @@
 package com.example.brainquiz.filter;
-
-import com.google.gson.annotations.SerializedName;
-
 public class Kelas {
-    @SerializedName("id")
-    private int id;
+    private int ID;
+    private String CreatedAt;
+    private String UpdatedAt;
+    private String DeletedAt;
+    private String name;
+    private String description;
 
-    @SerializedName("createdAt")
-    private String createdAt;
-
-    @SerializedName("updatedAt")
-    private String updatedAt;
-
-    @SerializedName("deletedAt")
-    private String deletedAt;
-
-    @SerializedName("nama")
-    private String nama;
-
-    @SerializedName("deskripsi")
-    private String deskripsi;
-
-    @SerializedName("role")
-    private Integer role;
-
-    public int getId() {
-        return id;
+    // Getter dan Setter
+    public int getID() {
+        return ID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setID(int ID) {
+        this.ID = ID;
     }
 
     public String getCreatedAt() {
-        return createdAt;
+        return CreatedAt;
     }
 
     public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+        CreatedAt = createdAt;
     }
 
     public String getUpdatedAt() {
-        return updatedAt;
+        return UpdatedAt;
     }
 
     public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
+        UpdatedAt = updatedAt;
     }
 
     public String getDeletedAt() {
-        return deletedAt;
+        return DeletedAt;
     }
 
     public void setDeletedAt(String deletedAt) {
-        this.deletedAt = deletedAt;
+        DeletedAt = deletedAt;
     }
 
-    public String getNama() {
-        return nama;
+    public String getName() {
+        return name;
     }
 
-    public void setNama(String nama) {
-        this.nama = nama;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDeskripsi() {
-        return deskripsi;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDeskripsi(String deskripsi) {
-        this.deskripsi = deskripsi;
-    }
-
-    public Integer getRole() {
-        return role;
-    }
-
-    public void setRole(Integer role) {
-        this.role = role;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
