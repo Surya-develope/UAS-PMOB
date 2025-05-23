@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!--‑‑ Header ‑‑-->
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,114 +72,7 @@
             android:columnCount="2"
             android:rowCount="2"
             android:useDefaultMargins="true">
-
-            <!-- Mudah -->
-            <LinearLayout
-                android:id="@+id/card_mudah"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="@drawable/bg_tingkatan_card">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_chart_bar"
-                    android:tint="#FFFFFF" />
-
-                <TextView
-                    android:id="@+id/tv_mudah"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Mudah"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Sedang -->
-            <LinearLayout
-                android:id="@+id/card_sedang"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="@drawable/bg_tingkatan_card">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_chart_bar"
-                    android:tint="#FFFFFF" />
-
-                <TextView
-                    android:id="@+id/tv_sedang"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sedang"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Sulit -->
-            <LinearLayout
-                android:id="@+id/card_sulit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="@drawable/bg_tingkatan_card">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_chart_bar"
-                    android:tint="#FFFFFF" />
-
-                <TextView
-                    android:id="@+id/tv_sulit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sulit"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <!-- Sangat Sulit -->
-            <LinearLayout
-                android:id="@+id/card_sangat_sulit"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:background="@drawable/bg_tingkatan_card">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_chart_bar"
-                    android:tint="#FFFFFF" />
-
-                <TextView
-                    android:id="@+id/tv_sangat_sulit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Sangat Sulit"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
-            </LinearLayout>
+            <!-- Cards will be added dynamically -->
         </GridLayout>
     </LinearLayout>
 </ScrollView>

@@ -3,23 +3,23 @@ package com.example.brainquiz.filter;
 import com.google.gson.annotations.SerializedName;
 
 public class Pendidikan {
-    @SerializedName("id")
+    @SerializedName("ID")
     private int id;
 
-    @SerializedName("createdAt")
+    @SerializedName("CreatedAt")
     private String createdAt;
 
-    @SerializedName("updatedAt")
+    @SerializedName("UpdatedAt")
     private String updatedAt;
 
-    @SerializedName("deletedAt")
+    @SerializedName("DeletedAt")
     private String deletedAt;
 
-    @SerializedName("nama")
-    private String nama;
+    @SerializedName("name")
+    private String name;
 
-    @SerializedName("deskripsi")
-    private String deskripsi;
+    @SerializedName("description")
+    private String description;
 
     public int getId() {
         return id;
@@ -54,18 +54,18 @@ public class Pendidikan {
     }
 
     public String getNama() {
-        return nama;
+        return name;
     }
 
-    public void setNama(String nama) {
-        this.nama = nama;
+    public void setNama(String name) {
+        this.name = name;
     }
 
-    public String getDeskripsi() {
-        return deskripsi;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDeskripsi(String deskripsi) {
-        this.deskripsi = deskripsi;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
