@@ -109,6 +109,11 @@
                 android:id="@+id/spinnerRole"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#2196F3"
+                android:background="@drawable/bg_button_simpan"
+                android:padding="12dp"
+                android:textColor="#ffffff"
+                android:textStyle="bold"
                 android:layout_marginBottom="16dp"/>
 
             <!-- Tombol Register -->
@@ -118,6 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:backgroundTint="#2196F3"
+                android:background="@drawable/bg_button_simpan"
                 android:padding="12dp"
                 android:text="Daftar"
                 android:textColor="#FFFFFF" />
