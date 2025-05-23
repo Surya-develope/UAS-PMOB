@@ -7,7 +7,7 @@ public class Kategori {
     @SerializedName("id")
     private String id;
 
-    @SerializedName("nama")
+    @SerializedName("name")
     private String nama;
 
     public String getId() {
@@ -24,5 +24,13 @@ public class Kategori {
 
     public void setNama(String nama) {
         this.nama = nama;
+    }
+
+    @Override
+    public String toString() {
+        return "Kategori{" +
+                "id='" + id + '\'' +
+                ", name='" + nama + '\'' +
+                '}';
     }
 }
