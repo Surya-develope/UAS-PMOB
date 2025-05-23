@@ -32,13 +32,23 @@
         <activity
             android:name=".PendidikanActivity"
             android:exported="false" />
-
+        <activity
+            android:name=".TambahPendidikanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TambahKelasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TambahKategoriActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TambahTingkatanActivity"
+            android:exported="false" />
         <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

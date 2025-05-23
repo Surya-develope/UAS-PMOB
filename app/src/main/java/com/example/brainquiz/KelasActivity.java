@@ -1,5 +1,6 @@
 package com.example.brainquiz;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.brainquiz.filter.Kelas;
-import com.example.brainquiz.KelasResponse;
 import com.example.brainquiz.network.ApiService;
 
 import java.util.List;
@@ -30,9 +30,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class KelasActivity extends AppCompatActivity {
 
     private GridLayout gridLayout;
-    private Button btnTambahTingkatan;
+    private Button btnTambahKelas; // Renamed from btnTambahTingkatan
     private EditText searchBar;
-
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
 
@@ -41,21 +40,38 @@ public class KelasActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_kelas);
 
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
+        // Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
+        // Initialize views
         gridLayout = findViewById(R.id.gridLayout);
-        btnTambahTingkatan = findViewById(R.id.btnTambahTingkatan);
+        btnTambahKelas = findViewById(R.id.btnTambahKelas); // Update ID
         searchBar = findViewById(R.id.searchBar);
 
+        // Initialize Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
-        fetchKelas();
+        // Set click listener for "Tambah Kelas" button
+        btnTambahKelas.setOnClickListener(v -> {
+            Intent intent = new Intent(KelasActivity.this, TambahKelasActivity.class);
+            startActivity(intent);
+        });
 
-        btnTambahTingkatan.setOnClickListener(v -> Toast.makeText(this, "Tambah Tingkatan diklik", Toast.LENGTH_SHORT).show());
+        // Fetch initial data
+        fetchKelas();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when returning from TambahKelasActivity
+        fetchKelas();
     }
 
     private String getToken() {
@@ -70,30 +86,38 @@ public class KelasActivity extends AppCompatActivity {
             return;
         }
 
+        Log.d("KelasActivity", "Token: " + token);
         apiService.getKelas("Bearer " + token).enqueue(new Callback<KelasResponse>() {
             @Override
             public void onResponse(Call<KelasResponse> call, Response<KelasResponse> response) {
+                Log.d("KelasActivity", "Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     List<Kelas> data = response.body().getData();
                     Toast.makeText(KelasActivity.this, "Dapat " + data.size() + " kelas", Toast.LENGTH_SHORT).show();
                     bindDataToCards(data);
                 } else {
                     Log.e("KelasActivity", "Error " + response.code());
+                    if (response.errorBody() != null) {
+                        try {
+                            Log.e("KelasActivity", "Error Body: " + response.errorBody().string());
+                        } catch (Exception e) {
+                            Log.e("KelasActivity", "Error reading error body: " + e.getMessage());
+                        }
+                    }
                     Toast.makeText(KelasActivity.this, "Gagal mengambil data: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<KelasResponse> call, Throwable t) {
+                Log.e("KelasActivity", "onFailure: " + t.getMessage(), t);
                 Toast.makeText(KelasActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("KelasActivity", "onFailure: ", t);
             }
         });
     }
 
     private void bindDataToCards(List<Kelas> list) {
         gridLayout.removeAllViews();
-
         for (Kelas kelas : list) {
             LinearLayout card = new LinearLayout(this);
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
@@ -119,7 +143,7 @@ public class KelasActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
-            textView.setText(kelas.getName());
+            textView.setText(kelas.getNama());
             textView.setTextColor(getResources().getColor(android.R.color.white));
             textView.setTextSize(16);
             textView.setTypeface(null, Typeface.BOLD);

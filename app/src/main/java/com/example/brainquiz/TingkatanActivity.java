@@ -1,9 +1,12 @@
 package com.example.brainquiz;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
+import android.view.Gravity;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,26 +29,47 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class TingkatanActivity extends AppCompatActivity {
 
     private GridLayout gridTingkatan;
+    private Button btnTambahTingkatan;
+    private EditText etCariTingkatan;
     private ApiService apiService;
+    private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tingkatan);
 
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
+        // Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
-        // Initialize GridLayout
+        // Initialize views
         gridTingkatan = findViewById(R.id.grid_tingkatan);
+        btnTambahTingkatan = findViewById(R.id.btn_tambah_tingkatan);
+        etCariTingkatan = findViewById(R.id.et_cari_tingkatan);
 
         // Initialize Retrofit
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://brainquiz0.up.railway.app/")
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
-        // Fetch data
+        // Set click listener for "Tambah Tingkatan" button
+        btnTambahTingkatan.setOnClickListener(v -> {
+            Intent intent = new Intent(TingkatanActivity.this, TambahTingkatanActivity.class);
+            startActivity(intent);
+        });
+
+        // Fetch initial data
+        fetchTingkatan();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when returning from TambahTingkatanActivity
         fetchTingkatan();
     }
 
@@ -61,21 +85,35 @@ public class TingkatanActivity extends AppCompatActivity {
             return;
         }
 
+        Log.d("TingkatanActivity", "Token: " + token);
         apiService.getTingkatan("Bearer " + token).enqueue(new Callback<TingkatanResponse>() {
             @Override
-            public void onResponse(Call<TingkatanResponse> call, Response<TingkatanResponse> res) {
-                if (res.isSuccessful() && res.body() != null) {
-                    List<Tingkatan> data = res.body().getData();
-                    Toast.makeText(TingkatanActivity.this, "Dapat " + data.size() + " tingkatan", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call<TingkatanResponse> call, Response<TingkatanResponse> response) {
+                Log.d("TingkatanActivity", "Response Code: " + response.code());
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Tingkatan> data = response.body().getData();
+                    if (data.isEmpty()) {
+                        Toast.makeText(TingkatanActivity.this, "Tidak ada tingkatan", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(TingkatanActivity.this, "Dapat " + data.size() + " tingkatan", Toast.LENGTH_SHORT).show();
+                    }
                     bindDataToCards(data);
                 } else {
-                    Log.e("TingkatanActivity", "Error " + res.code());
-                    Toast.makeText(TingkatanActivity.this, "Gagal mengambil data", Toast.LENGTH_SHORT).show();
+                    Log.e("TingkatanActivity", "Error " + response.code());
+                    if (response.errorBody() != null) {
+                        try {
+                            Log.e("TingkatanActivity", "Error Body: " + response.errorBody().string());
+                        } catch (Exception e) {
+                            Log.e("TingkatanActivity", "Error reading error body: " + e.getMessage());
+                        }
+                    }
+                    Toast.makeText(TingkatanActivity.this, "Gagal mengambil data: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<TingkatanResponse> call, Throwable t) {
+                Log.e("TingkatanActivity", "onFailure: " + t.getMessage(), t);
                 Toast.makeText(TingkatanActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -93,7 +131,7 @@ public class TingkatanActivity extends AppCompatActivity {
             params.setMargins(8, 8, 8, 8); // Match useDefaultMargins
             card.setLayoutParams(params);
             card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(android.view.Gravity.CENTER);
+            card.setGravity(Gravity.CENTER);
             card.setPadding(16, 16, 16, 16);
             card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 

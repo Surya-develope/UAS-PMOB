@@ -1,9 +1,10 @@
 package com.example.brainquiz;
 
-import android.content.SharedPreferences;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -28,22 +29,43 @@ public class PendidikanActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
     private ApiService apiService;
     private GridLayout gridPendidikan;
+    private Button btnTambahPendidikan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pendidikan);
 
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
+        // Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
+        // Initialize views
         gridPendidikan = findViewById(R.id.grid_pendidikan);
+        btnTambahPendidikan = findViewById(R.id.btn_tambah_pendidikan);
 
+        // Initialize Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
+        // Set click listener for "Tambah Pendidikan" button
+        btnTambahPendidikan.setOnClickListener(v -> {
+            Intent intent = new Intent(PendidikanActivity.this, TambahPendidikanActivity.class);
+            startActivity(intent);
+        });
+
+        // Fetch initial data
+        fetchPendidikan();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when returning from TambahPendidikanActivity
         fetchPendidikan();
     }
 
@@ -93,28 +115,24 @@ public class PendidikanActivity extends AppCompatActivity {
     }
 
     private void bindDataToCards(List<Pendidikan> list) {
-        gridPendidikan.removeAllViews(); // Clear existing views
-
+        gridPendidikan.removeAllViews();
         for (Pendidikan pendidikan : list) {
-            // Create LinearLayout for the card
             LinearLayout card = new LinearLayout(this);
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f); // Equal column weight
-            params.setMargins(8, 8, 8, 8); // Match useDefaultMargins
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            params.setMargins(8, 8, 8, 8);
             card.setLayoutParams(params);
             card.setOrientation(LinearLayout.VERTICAL);
             card.setGravity(android.view.Gravity.CENTER);
             card.setPadding(16, 16, 16, 16);
             card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
-            // Create ImageView
             ImageView imageView = new ImageView(this);
             imageView.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
             imageView.setImageResource(R.drawable.ic_chart_bar);
             imageView.setColorFilter(getResources().getColor(android.R.color.white));
 
-            // Create TextView
             TextView textView = new TextView(this);
             LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -126,14 +144,11 @@ public class PendidikanActivity extends AppCompatActivity {
             textView.setTextColor(getResources().getColor(android.R.color.white));
             textView.setTextSize(14);
 
-            // Add views to card
             card.addView(imageView);
             card.addView(textView);
 
-            // Set click listener
             card.setOnClickListener(v -> Toast.makeText(this, pendidikan.getNama() + " diklik", Toast.LENGTH_SHORT).show());
 
-            // Add card to GridLayout
             gridPendidikan.addView(card);
         }
     }

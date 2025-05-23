@@ -57,7 +57,7 @@
 
         <!-- Tombol Tambah Tingkatan -->
         <Button
-            android:id="@+id/btnTambahTingkatan"
+            android:id="@+id/btnTambahKelas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

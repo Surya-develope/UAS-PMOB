@@ -1,50 +1,63 @@
 package com.example.brainquiz.filter;
+
+import com.google.gson.annotations.SerializedName;
+
 public class Kelas {
-    private int ID;
-    private String CreatedAt;
-    private String UpdatedAt;
-    private String DeletedAt;
+    @SerializedName("ID")
+    private int id;
+
+    @SerializedName("CreatedAt")
+    private String createdAt;
+
+    @SerializedName("UpdatedAt")
+    private String updatedAt;
+
+    @SerializedName("DeletedAt")
+    private String deletedAt;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("description")
     private String description;
 
-    // Getter dan Setter
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getCreatedAt() {
-        return CreatedAt;
+        return createdAt;
     }
 
     public void setCreatedAt(String createdAt) {
-        CreatedAt = createdAt;
+        this.createdAt = createdAt;
     }
 
     public String getUpdatedAt() {
-        return UpdatedAt;
+        return updatedAt;
     }
 
     public void setUpdatedAt(String updatedAt) {
-        UpdatedAt = updatedAt;
+        this.updatedAt = updatedAt;
     }
 
     public String getDeletedAt() {
-        return DeletedAt;
+        return deletedAt;
     }
 
     public void setDeletedAt(String deletedAt) {
-        DeletedAt = deletedAt;
+        this.deletedAt = deletedAt;
     }
 
-    public String getName() {
+    public String getNama() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setNama(String name) {
         this.name = name;
     }
 
