@@ -1,8 +1,10 @@
 package com.example.brainquiz;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.GridLayout;
@@ -12,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import com.example.brainquiz.network.ApiService;
 import com.example.brainquiz.filter.Kategori;
@@ -68,11 +71,10 @@ public class KategoriActivity extends AppCompatActivity {
             public void onResponse(Call<KategoriResponse> call, Response<KategoriResponse> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     List<Kategori> kategoriList = response.body().getData();
-                    Toast.makeText(KategoriActivity.this, "Dapat " + kategoriList.size() + " kategori", Toast.LENGTH_SHORT).show();
+                    if(kategoriList.isEmpty()) {
+                        Toast.makeText(KategoriActivity.this, "Tidak ada kategori", Toast.LENGTH_SHORT).show();
+                    }
                     tampilkanKategori(kategoriList);
-                } else {
-                    Log.e("KategoriActivity", "Error " + response.code());
-                    Toast.makeText(KategoriActivity.this, "Gagal mengambil data kategori", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -86,47 +88,65 @@ public class KategoriActivity extends AppCompatActivity {
 
     private void tampilkanKategori(List<Kategori> listKategori) {
         gridKategori.removeAllViews();
+        gridKategori.setColumnCount(2);
 
-        for (Kategori kategori : listKategori) {
+        final float density = getResources().getDisplayMetrics().density;
+
+        for(Kategori kategori : listKategori) {
+            // 1. Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
             card.setGravity(Gravity.CENTER);
-            int paddingPx = (int) (16 * getResources().getDisplayMetrics().density);
-            card.setPadding(paddingPx, paddingPx, paddingPx, paddingPx);
-            card.setBackgroundResource(R.drawable.bg_tingkatan_card); // Ensure this drawable exists
 
+            // 2. Layout Parameters (Match XML)
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-            int marginPx = (int) (8 * getResources().getDisplayMetrics().density);
-            params.setMargins(marginPx, marginPx, marginPx, marginPx);
+            params.columnSpec = GridLayout.spec(
+                    GridLayout.UNDEFINED,
+                    GridLayout.FILL,
+                    1f
+            );
+            params.setMargins(
+                    (int)(16 * density),
+                    (int)(16 * density),
+                    (int)(16 * density),
+                    (int)(16 * density)
+            );
             card.setLayoutParams(params);
 
-            // Icon
+            // 3. Styling
+            card.setPadding(
+                    (int)(16 * density),
+                    (int)(16 * density),
+                    (int)(16 * density),
+                    (int)(16 * density)
+            );
+            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
+
+            // 4. ImageView
             ImageView icon = new ImageView(this);
-            int sizePx = (int) (48 * getResources().getDisplayMetrics().density);
-            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(sizePx, sizePx);
-            icon.setLayoutParams(iconParams);
-            icon.setImageResource(R.drawable.ic_book); // Ensure this drawable exists
-            icon.setColorFilter(getResources().getColor(android.R.color.white));
+            icon.setLayoutParams(new LinearLayout.LayoutParams(
+                    (int)(48 * density),
+                    (int)(48 * density)
+            ));
+            icon.setImageResource(R.drawable.ic_book);
+            icon.setColorFilter(Color.WHITE);
             card.addView(icon);
 
-            // Category Name
-            TextView nama = new TextView(this);
-            LinearLayout.LayoutParams namaParams = new LinearLayout.LayoutParams(
+            // 5. TextView
+            TextView tvNama = new TextView(this);
+            tvNama.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            namaParams.topMargin = (int) (8 * getResources().getDisplayMetrics().density);
-            nama.setLayoutParams(namaParams);
-            nama.setText(kategori.getNama());
-            nama.setTextColor(getResources().getColor(android.R.color.white));
-            nama.setTextSize(14);
-            card.addView(nama);
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            tvNama.setText(kategori.getNama());
+            tvNama.setTextColor(Color.WHITE);
+            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            tvNama.setPadding(0, (int)(8 * density), 0, 0);
+            card.addView(tvNama);
 
-            // Add click listener for the card
-            card.setOnClickListener(v -> Toast.makeText(this, kategori.getNama() + " diklik", Toast.LENGTH_SHORT).show());
-
+            // 6. Add to Grid
             gridKategori.addView(card);
         }
     }
