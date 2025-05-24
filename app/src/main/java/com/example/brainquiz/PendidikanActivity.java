@@ -1,9 +1,13 @@
 package com.example.brainquiz;
 
-import android.content.SharedPreferences;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -12,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.network.ApiService;
 
@@ -28,22 +33,43 @@ public class PendidikanActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
     private ApiService apiService;
     private GridLayout gridPendidikan;
+    private Button btnTambahPendidikan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pendidikan);
 
-        if (getSupportActionBar() != null) getSupportActionBar().hide();
+        // Hide action bar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
+        // Initialize views
         gridPendidikan = findViewById(R.id.grid_pendidikan);
+        btnTambahPendidikan = findViewById(R.id.btn_tambah_pendidikan);
 
+        // Initialize Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         apiService = retrofit.create(ApiService.class);
 
+        // Set click listener for "Tambah Pendidikan" button
+        btnTambahPendidikan.setOnClickListener(v -> {
+            Intent intent = new Intent(PendidikanActivity.this, TambahPendidikanActivity.class);
+            startActivity(intent);
+        });
+
+        // Fetch initial data
+        fetchPendidikan();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Refresh data when returning from TambahPendidikanActivity
         fetchPendidikan();
     }
 
@@ -70,7 +96,7 @@ public class PendidikanActivity extends AppCompatActivity {
                     List<Pendidikan> data = response.body().getData();
                     Log.d("PendidikanActivity", "Data Size: " + data.size());
                     Toast.makeText(PendidikanActivity.this, "Dapat " + data.size() + " pendidikan", Toast.LENGTH_SHORT).show();
-                    bindDataToCards(data);
+                    tampilanpendidikan(data);
                 } else {
                     Log.e("PendidikanActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -92,48 +118,63 @@ public class PendidikanActivity extends AppCompatActivity {
         });
     }
 
-    private void bindDataToCards(List<Pendidikan> list) {
-        gridPendidikan.removeAllViews(); // Clear existing views
+    private void tampilanpendidikan(List<Pendidikan> listpendidikan) {
+        gridPendidikan.removeAllViews();
+        gridPendidikan.setColumnCount(2);
 
-        for (Pendidikan pendidikan : list) {
-            // Create LinearLayout for the card
+        final float density = getResources().getDisplayMetrics().density;
+
+        for (Pendidikan pendidikan : listpendidikan) {
+            // Container Card
             LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setGravity(Gravity.CENTER);
+
+            // Layout Parameters
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f); // Equal column weight
-            params.setMargins(8, 8, 8, 8); // Match useDefaultMargins
+            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
+            params.setMargins(
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density)
+            );
             card.setLayoutParams(params);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(android.view.Gravity.CENTER);
-            card.setPadding(16, 16, 16, 16);
+
+            // Styling
+            card.setPadding(
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density)
+            );
             card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
-            // Create ImageView
-            ImageView imageView = new ImageView(this);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
-            imageView.setImageResource(R.drawable.ic_chart_bar);
-            imageView.setColorFilter(getResources().getColor(android.R.color.white));
+            // ImageView
+            ImageView icon = new ImageView(this);
+            icon.setLayoutParams(new LinearLayout.LayoutParams(
+                    (int) (48 * density),
+                    (int) (48 * density)
+            ));
+            icon.setImageResource(R.drawable.ic_pendidikan);
+            icon.setColorFilter(Color.WHITE);
+            card.addView(icon);
 
-            // Create TextView
-            TextView textView = new TextView(this);
-            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
+            // TextView
+            TextView tvNama = new TextView(this);
+            tvNama.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            textParams.setMargins(0, 8, 0, 0);
-            textView.setLayoutParams(textParams);
-            textView.setText(pendidikan.getNama());
-            textView.setTextColor(getResources().getColor(android.R.color.white));
-            textView.setTextSize(14);
+            ));
+            tvNama.setText(pendidikan.getNama());
+            tvNama.setTextColor(Color.WHITE);
+            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            tvNama.setPadding(0, (int) (8 * density), 0, 0);
+            card.addView(tvNama);
 
-            // Add views to card
-            card.addView(imageView);
-            card.addView(textView);
-
-            // Set click listener
-            card.setOnClickListener(v -> Toast.makeText(this, pendidikan.getNama() + " diklik", Toast.LENGTH_SHORT).show());
-
-            // Add card to GridLayout
+            // Add to Grid
             gridPendidikan.addView(card);
         }
     }

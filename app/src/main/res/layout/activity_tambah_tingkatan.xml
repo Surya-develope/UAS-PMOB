@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -45,7 +44,8 @@
                 android:background="@drawable/bg_input_border"
                 android:paddingHorizontal="12dp"
                 android:hint="Masukkan nama"
-                android:textColorHint="#999" />
+                android:textColorHint="#999"
+                android:textColor="#000000"/>
 
             <!-- Input Deskripsi -->
             <TextView
@@ -65,7 +65,8 @@
                 android:padding="12dp"
                 android:hint="Masukkan deskripsi"
                 android:textColorHint="#999"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:textColor="#000000"/>
         </LinearLayout>
 
         <!-- Tombol Simpan -->
@@ -80,7 +81,6 @@
             android:textColor="#FFFFFF"
             android:background="@drawable/bg_button_simpan"
             android:backgroundTint="@null"
-            style="@style/Widget.AppCompat.Button"/>
-
+            style="@style/Widget.AppCompat.Button" />
     </LinearLayout>
 </ScrollView>

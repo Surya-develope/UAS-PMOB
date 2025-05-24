@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,7 +9,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Judul -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,7 +19,6 @@
             android:layout_gravity="end"
             android:layout_marginBottom="24dp" />
 
-        <!-- Card Putih -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +27,6 @@
             android:background="@drawable/bg_card_white"
             android:elevation="4dp">
 
-            <!-- Input Nama -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -45,9 +41,9 @@
                 android:background="@drawable/bg_input_border"
                 android:paddingHorizontal="12dp"
                 android:hint="Masukkan nama"
-                android:textColorHint="#999" />
+                android:textColorHint="#999"
+                android:textColor="#000000"/>
 
-            <!-- Input Deskripsi -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -65,10 +61,10 @@
                 android:padding="12dp"
                 android:hint="Masukkan deskripsi"
                 android:textColorHint="#999"
-                android:inputType="textMultiLine" />
+                android:inputType="textMultiLine"
+                android:textColor="#000000"/>
         </LinearLayout>
 
-        <!-- Tombol Simpan -->
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSimpan"
             android:layout_width="120dp"
@@ -80,7 +76,6 @@
             android:textColor="#FFFFFF"
             android:background="@drawable/bg_button_simpan"
             android:backgroundTint="@null"
-            style="@style/Widget.AppCompat.Button"/>
-
+            style="@style/Widget.AppCompat.Button" />
     </LinearLayout>
 </ScrollView>

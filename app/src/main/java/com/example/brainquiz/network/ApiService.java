@@ -26,7 +26,7 @@ public interface ApiService {
     Call<User> register(@Body User user);
 
     @POST("user/login")
-    Call<ResponseBody> login(@Body LoginRequest loginRequest);  // buat class LoginRequest untuk email+password
+    Call<ResponseBody> login(@Body LoginRequest loginRequest);
 
     @GET("user/get-user")
     Call<User> getUser(@Header("Authorization") String token);
@@ -34,13 +34,24 @@ public interface ApiService {
     @GET("tingkatan/get-tingkatan")
     Call<TingkatanResponse> getTingkatan(@Header("Authorization") String token);
 
+    @POST("tingkatan/add-tingkatan")
+    Call<TingkatanResponse> addTingkatan(@Header("Authorization") String token, @Body Tingkatan tingkatan);
+
     @GET("pendidikan/get-pendidikan")
     Call<PendidikanResponse> getPendidikan(@Header("Authorization") String token);
+
+    @POST("pendidikan/add-pendidikan")
+    Call<PendidikanResponse> addPendidikan(@Header("Authorization") String token, @Body Pendidikan pendidikan);
 
     @GET("kategori/get-kategori")
     Call<KategoriResponse> getKategori(@Header("Authorization") String token);
 
+    @POST("kategori/add-kategori")
+    Call<KategoriResponse> addKategori(@Header("Authorization") String token, @Body Kategori kategori);
+
     @GET("kelas/get-kelas")
     Call<KelasResponse> getKelas(@Header("Authorization") String token);
 
+    @POST("kelas/add-kelas")
+    Call<KelasResponse> addKelas(@Header("Authorization") String token, @Body Kelas kelas);
 }

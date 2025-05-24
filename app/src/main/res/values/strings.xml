@@ -4,5 +4,6 @@
     <string-array name="role_array">
         <item>student</item>
         <item>teacher</item>
+        <item>admin</item>
     </string-array>
 </resources>
