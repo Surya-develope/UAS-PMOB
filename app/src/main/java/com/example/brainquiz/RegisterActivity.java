@@ -31,7 +31,8 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        // Prepare your list of roles
+// Set up the custom ArrayAdapter
         // Initialize views
         nameEditText = findViewById(R.id.etUsername);
         emailEditText = findViewById(R.id.etEmail);
@@ -41,10 +42,18 @@ public class RegisterActivity extends AppCompatActivity {
         tvToLogin = findViewById(R.id.tvToLogin);
 
         // Set up the Spinner with role options
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.role_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+// Prepare your list of roles
+        String[] rolesList = getResources().getStringArray(R.array.role_array);
+
+// Set up the custom ArrayAdapter
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                R.layout.spinner_item, // custom item layout
+                rolesList
+        );
+        adapter.setDropDownViewResource(R.layout.spinner_item);
         roleSpinner.setAdapter(adapter);
+
 
         tvToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
