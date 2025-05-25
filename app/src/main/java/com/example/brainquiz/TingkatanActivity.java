@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Tingkatan;
 import com.example.brainquiz.network.ApiService;
 
@@ -99,7 +100,7 @@ public class TingkatanActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(TingkatanActivity.this, "Dapat " + data.size() + " tingkatan", Toast.LENGTH_SHORT).show();
                     }
-                    tampilkanTingkatan(data);
+                    tampilantingkatan(data);
                 } else {
                     Log.e("TingkatanActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -121,13 +122,13 @@ public class TingkatanActivity extends AppCompatActivity {
         });
     }
 
-    private void tampilkanTingkatan(List<Tingkatan> listTingkatan) {
+    private void tampilantingkatan(List<Tingkatan> listtingkatan) {
         gridTingkatan.removeAllViews();
         gridTingkatan.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
 
-        for (Tingkatan tingkatan : listTingkatan) {
+        for (Tingkatan tingkatan : listtingkatan) {
             // Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -174,12 +175,8 @@ public class TingkatanActivity extends AppCompatActivity {
             tvNama.setText(tingkatan.getNama());
             tvNama.setTextColor(Color.WHITE);
             tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvNama.setTypeface(null, Typeface.BOLD);
             tvNama.setPadding(0, (int) (8 * density), 0, 0);
             card.addView(tvNama);
-
-            // Click listener for card
-            card.setOnClickListener(v -> Toast.makeText(this, tingkatan.getNama() + " diklik", Toast.LENGTH_SHORT).show());
 
             // Add to Grid
             gridTingkatan.addView(card);

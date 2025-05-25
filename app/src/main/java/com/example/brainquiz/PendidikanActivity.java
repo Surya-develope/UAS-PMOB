@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.network.ApiService;
 
@@ -95,7 +96,7 @@ public class PendidikanActivity extends AppCompatActivity {
                     List<Pendidikan> data = response.body().getData();
                     Log.d("PendidikanActivity", "Data Size: " + data.size());
                     Toast.makeText(PendidikanActivity.this, "Dapat " + data.size() + " pendidikan", Toast.LENGTH_SHORT).show();
-                    tampilkanPendidikan(data);
+                    tampilanpendidikan(data);
                 } else {
                     Log.e("PendidikanActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -117,13 +118,13 @@ public class PendidikanActivity extends AppCompatActivity {
         });
     }
 
-    private void tampilkanPendidikan(List<Pendidikan> listPendidikan) {
+    private void tampilanpendidikan(List<Pendidikan> listpendidikan) {
         gridPendidikan.removeAllViews();
         gridPendidikan.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
 
-        for (Pendidikan pendidikan : listPendidikan) {
+        for (Pendidikan pendidikan : listpendidikan) {
             // Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -170,12 +171,8 @@ public class PendidikanActivity extends AppCompatActivity {
             tvNama.setText(pendidikan.getNama());
             tvNama.setTextColor(Color.WHITE);
             tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvNama.setTypeface(null, Typeface.BOLD);
             tvNama.setPadding(0, (int) (8 * density), 0, 0);
             card.addView(tvNama);
-
-            // Click listener for card
-            card.setOnClickListener(v -> Toast.makeText(this, pendidikan.getNama() + " diklik", Toast.LENGTH_SHORT).show());
 
             // Add to Grid
             gridPendidikan.addView(card);

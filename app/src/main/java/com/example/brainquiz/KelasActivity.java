@@ -3,6 +3,7 @@ package com.example.brainquiz;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.brainquiz.filter.Kategori;
 import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.network.ApiService;
 
@@ -31,7 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class KelasActivity extends AppCompatActivity {
 
     private GridLayout gridLayout;
-    private Button btnTambahKelas;
+    private Button btnTambahKelas; // Renamed from btnTambahTingkatan
     private EditText searchBar;
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
@@ -48,7 +50,7 @@ public class KelasActivity extends AppCompatActivity {
 
         // Initialize views
         gridLayout = findViewById(R.id.gridLayout);
-        btnTambahKelas = findViewById(R.id.btnTambahKelas);
+        btnTambahKelas = findViewById(R.id.btnTambahKelas); // Update ID
         searchBar = findViewById(R.id.searchBar);
 
         // Initialize Retrofit
@@ -117,13 +119,13 @@ public class KelasActivity extends AppCompatActivity {
         });
     }
 
-    private void tampilkanKategori(List<Kelas> listKelas) {
+    private void tampilkanKategori(List<Kelas> listkelas) {
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
 
-        for (Kelas kelas : listKelas) {
+        for (Kelas kelas : listkelas) {
             // Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -170,12 +172,8 @@ public class KelasActivity extends AppCompatActivity {
             tvNama.setText(kelas.getNama());
             tvNama.setTextColor(Color.WHITE);
             tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvNama.setTypeface(null, Typeface.BOLD);
             tvNama.setPadding(0, (int) (8 * density), 0, 0);
             card.addView(tvNama);
-
-            // Click listener for card
-            card.setOnClickListener(v -> Toast.makeText(this, kelas.getNama() + " diklik", Toast.LENGTH_SHORT).show());
 
             // Add to Grid
             gridLayout.addView(card);
