@@ -2,8 +2,11 @@ package com.example.brainquiz;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -92,7 +95,7 @@ public class PendidikanActivity extends AppCompatActivity {
                     List<Pendidikan> data = response.body().getData();
                     Log.d("PendidikanActivity", "Data Size: " + data.size());
                     Toast.makeText(PendidikanActivity.this, "Dapat " + data.size() + " pendidikan", Toast.LENGTH_SHORT).show();
-                    bindDataToCards(data);
+                    tampilkanPendidikan(data);
                 } else {
                     Log.e("PendidikanActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -114,41 +117,67 @@ public class PendidikanActivity extends AppCompatActivity {
         });
     }
 
-    private void bindDataToCards(List<Pendidikan> list) {
+    private void tampilkanPendidikan(List<Pendidikan> listPendidikan) {
         gridPendidikan.removeAllViews();
-        for (Pendidikan pendidikan : list) {
+        gridPendidikan.setColumnCount(2);
+
+        final float density = getResources().getDisplayMetrics().density;
+
+        for (Pendidikan pendidikan : listPendidikan) {
+            // Container Card
             LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setGravity(Gravity.CENTER);
+
+            // Layout Parameters
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
-            params.setMargins(8, 8, 8, 8);
+            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
+            params.setMargins(
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density)
+            );
             card.setLayoutParams(params);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(android.view.Gravity.CENTER);
-            card.setPadding(16, 16, 16, 16);
+
+            // Styling
+            card.setPadding(
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density)
+            );
             card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
-            ImageView imageView = new ImageView(this);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(48, 48));
-            imageView.setImageResource(R.drawable.ic_chart_bar);
-            imageView.setColorFilter(getResources().getColor(android.R.color.white));
+            // ImageView
+            ImageView icon = new ImageView(this);
+            icon.setLayoutParams(new LinearLayout.LayoutParams(
+                    (int) (48 * density),
+                    (int) (48 * density)
+            ));
+            icon.setImageResource(R.drawable.ic_pendidikan);
+            icon.setColorFilter(Color.WHITE);
+            card.addView(icon);
 
-            TextView textView = new TextView(this);
-            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
+            // TextView
+            TextView tvNama = new TextView(this);
+            tvNama.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            textParams.setMargins(0, 8, 0, 0);
-            textView.setLayoutParams(textParams);
-            textView.setText(pendidikan.getNama());
-            textView.setTextColor(getResources().getColor(android.R.color.white));
-            textView.setTextSize(14);
+            ));
+            tvNama.setText(pendidikan.getNama());
+            tvNama.setTextColor(Color.WHITE);
+            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            tvNama.setTypeface(null, Typeface.BOLD);
+            tvNama.setPadding(0, (int) (8 * density), 0, 0);
+            card.addView(tvNama);
 
-            card.addView(imageView);
-            card.addView(textView);
-
+            // Click listener for card
             card.setOnClickListener(v -> Toast.makeText(this, pendidikan.getNama() + " diklik", Toast.LENGTH_SHORT).show());
 
+            // Add to Grid
             gridPendidikan.addView(card);
         }
     }

@@ -2,9 +2,10 @@ package com.example.brainquiz;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,7 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class KelasActivity extends AppCompatActivity {
 
     private GridLayout gridLayout;
-    private Button btnTambahKelas; // Renamed from btnTambahTingkatan
+    private Button btnTambahKelas;
     private EditText searchBar;
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
@@ -47,7 +48,7 @@ public class KelasActivity extends AppCompatActivity {
 
         // Initialize views
         gridLayout = findViewById(R.id.gridLayout);
-        btnTambahKelas = findViewById(R.id.btnTambahKelas); // Update ID
+        btnTambahKelas = findViewById(R.id.btnTambahKelas);
         searchBar = findViewById(R.id.searchBar);
 
         // Initialize Retrofit
@@ -94,7 +95,7 @@ public class KelasActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Kelas> data = response.body().getData();
                     Toast.makeText(KelasActivity.this, "Dapat " + data.size() + " kelas", Toast.LENGTH_SHORT).show();
-                    bindDataToCards(data);
+                    tampilkanKategori(data);
                 } else {
                     Log.e("KelasActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -116,40 +117,67 @@ public class KelasActivity extends AppCompatActivity {
         });
     }
 
-    private void bindDataToCards(List<Kelas> list) {
+    private void tampilkanKategori(List<Kelas> listKelas) {
         gridLayout.removeAllViews();
-        for (Kelas kelas : list) {
+        gridLayout.setColumnCount(2);
+
+        final float density = getResources().getDisplayMetrics().density;
+
+        for (Kelas kelas : listKelas) {
+            // Container Card
             LinearLayout card = new LinearLayout(this);
+            card.setOrientation(LinearLayout.VERTICAL);
+            card.setGravity(Gravity.CENTER);
+
+            // Layout Parameters
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
             params.width = 0;
             params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.setMargins(16, 16, 16, 16);
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1, 1f);
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
+            params.setMargins(
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density)
+            );
             card.setLayoutParams(params);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(Gravity.CENTER_HORIZONTAL);
-            card.setPadding(32, 32, 32, 32);
-            card.setBackgroundResource(R.drawable.bg_card);
-            card.setElevation(8f);
 
-            ImageView imageView = new ImageView(this);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(96, 96));
-            imageView.setImageResource(R.drawable.kelas);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-            card.addView(imageView);
+            // Styling
+            card.setPadding(
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density),
+                    (int) (16 * density)
+            );
+            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
-            TextView textView = new TextView(this);
-            textView.setLayoutParams(new LinearLayout.LayoutParams(
+            // ImageView
+            ImageView icon = new ImageView(this);
+            icon.setLayoutParams(new LinearLayout.LayoutParams(
+                    (int) (48 * density),
+                    (int) (48 * density)
+            ));
+            icon.setImageResource(R.drawable.ic_kelas);
+            icon.setColorFilter(Color.WHITE);
+            card.addView(icon);
+
+            // TextView
+            TextView tvNama = new TextView(this);
+            tvNama.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
-            textView.setText(kelas.getNama());
-            textView.setTextColor(getResources().getColor(android.R.color.white));
-            textView.setTextSize(16);
-            textView.setTypeface(null, Typeface.BOLD);
-            textView.setPadding(0, 12, 0, 0);
-            card.addView(textView);
+            tvNama.setText(kelas.getNama());
+            tvNama.setTextColor(Color.WHITE);
+            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            tvNama.setTypeface(null, Typeface.BOLD);
+            tvNama.setPadding(0, (int) (8 * density), 0, 0);
+            card.addView(tvNama);
 
+            // Click listener for card
+            card.setOnClickListener(v -> Toast.makeText(this, kelas.getNama() + " diklik", Toast.LENGTH_SHORT).show());
+
+            // Add to Grid
             gridLayout.addView(card);
         }
     }
