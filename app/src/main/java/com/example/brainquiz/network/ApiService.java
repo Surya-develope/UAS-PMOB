@@ -10,6 +10,7 @@ import com.example.brainquiz.models.User;
 import com.example.brainquiz.KategoriResponse;
 import com.example.brainquiz.KelasResponse;
 import com.example.brainquiz.PendidikanResponse;
+import com.example.brainquiz.KuisResponse;
 
 import java.util.List;
 
@@ -54,4 +55,7 @@ public interface ApiService {
 
     @POST("kelas/add-kelas")
     Call<KelasResponse> addKelas(@Header("Authorization") String token, @Body Kelas kelas);
+
+    @GET("kuis/get-kuis")
+    Call<KuisResponse> getKuis(@Header("Authorization") String token);
 }

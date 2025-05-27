@@ -33,6 +33,9 @@
             android:name=".PendidikanActivity"
             android:exported="false" />
         <activity
+            android:name=".KuisActivity"
+            android:exported="false" />
+        <activity
             android:name=".TambahPendidikanActivity"
             android:exported="false" />
         <activity
@@ -43,6 +46,12 @@
             android:exported="false" />
         <activity
             android:name=".TambahTingkatanActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TambahKuisActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

@@ -66,7 +66,7 @@ public class HomeActivity extends AppCompatActivity {
         menuKategori.setOnClickListener(v -> startActivity(new Intent(this, KategoriActivity.class)));
         menuKelas.setOnClickListener(v -> startActivity(new Intent(this, KelasActivity.class)));
         menuPendidikan.setOnClickListener(v -> startActivity(new Intent(this, PendidikanActivity.class)));
-        menuKuis.setOnClickListener(v -> showToast("Menu Kuis diklik"));
+        menuKuis.setOnClickListener(v -> startActivity(new Intent(this, KuisActivity.class)));
         menuSoal.setOnClickListener(v -> showToast("Menu Soal diklik"));
         menuJawabSoal.setOnClickListener(v -> showToast("Menu Jawab Soal diklik"));
         menuHasilKuis.setOnClickListener(v -> showToast("Menu Hasil Kuis diklik"));
