@@ -3,22 +3,27 @@ package com.example.brainquiz;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.Dialog;
+import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.network.ApiService;
+import com.example.brainquiz.PendidikanResponse;
 
 import java.util.List;
 
@@ -30,10 +35,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PendidikanActivity extends AppCompatActivity {
 
-    private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
-    private ApiService apiService;
     private GridLayout gridPendidikan;
     private Button btnTambahPendidikan;
+    private EditText searchBar;
+    private ApiService apiService;
+    private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
+    private static final int REQUEST_CODE_EDIT = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +53,9 @@ public class PendidikanActivity extends AppCompatActivity {
         }
 
         // Initialize views
-        gridPendidikan = findViewById(R.id.grid_pendidikan);
-        btnTambahPendidikan = findViewById(R.id.btn_tambah_pendidikan);
+        gridPendidikan = findViewById(R.id.gridPendidikan);
+        btnTambahPendidikan = findViewById(R.id.btnTambahPendidikan);
+        searchBar = findViewById(R.id.searchBar);
 
         // Initialize Retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -69,7 +77,6 @@ public class PendidikanActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh data when returning from TambahPendidikanActivity
         fetchPendidikan();
     }
 
@@ -90,13 +97,14 @@ public class PendidikanActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<PendidikanResponse> call, Response<PendidikanResponse> response) {
                 Log.d("PendidikanActivity", "Response Code: " + response.code());
-                Log.d("PendidikanActivity", "Raw Response: " + response.raw().toString());
-
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Pendidikan> data = response.body().getData();
-                    Log.d("PendidikanActivity", "Data Size: " + data.size());
-                    Toast.makeText(PendidikanActivity.this, "Dapat " + data.size() + " pendidikan", Toast.LENGTH_SHORT).show();
-                    tampilanpendidikan(data);
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<Pendidikan> pendidikanList = response.body().getData();
+                    if (pendidikanList.isEmpty()) {
+                        Toast.makeText(PendidikanActivity.this, "Tidak ada pendidikan", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(PendidikanActivity.this, "Dapat " + pendidikanList.size() + " pendidikan", Toast.LENGTH_SHORT).show();
+                    }
+                    tampilkanPendidikan(pendidikanList);
                 } else {
                     Log.e("PendidikanActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -118,13 +126,13 @@ public class PendidikanActivity extends AppCompatActivity {
         });
     }
 
-    private void tampilanpendidikan(List<Pendidikan> listpendidikan) {
+    private void tampilkanPendidikan(List<Pendidikan> listPendidikan) {
         gridPendidikan.removeAllViews();
         gridPendidikan.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
 
-        for (Pendidikan pendidikan : listpendidikan) {
+        for (Pendidikan pendidikan : listPendidikan) {
             // Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -158,24 +166,145 @@ public class PendidikanActivity extends AppCompatActivity {
                     (int) (48 * density),
                     (int) (48 * density)
             ));
-            icon.setImageResource(R.drawable.ic_pendidikan);
+            icon.setImageResource(R.drawable.ic_tingkatan);
             icon.setColorFilter(Color.WHITE);
             card.addView(icon);
 
-            // TextView
+            // TextView nama
             TextView tvNama = new TextView(this);
             tvNama.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
-            tvNama.setText(pendidikan.getNama());
+            String nama = pendidikan.getNama() != null ? pendidikan.getNama() : "Nama tidak tersedia";
+            tvNama.setText(nama);
             tvNama.setTextColor(Color.WHITE);
             tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             tvNama.setPadding(0, (int) (8 * density), 0, 0);
             card.addView(tvNama);
 
+            // Tambahkan tombol opsi (ikon tiga titik)
+            ImageView menuIcon = new ImageView(this);
+            menuIcon.setImageResource(R.drawable.ic_more_vert);
+            menuIcon.setColorFilter(Color.WHITE);
+
+            LinearLayout.LayoutParams menuParams = new LinearLayout.LayoutParams(
+                    (int) (24 * density),
+                    (int) (24 * density)
+            );
+            menuParams.gravity = Gravity.END;
+            menuParams.topMargin = (int) (8 * density);
+            menuIcon.setLayoutParams(menuParams);
+            card.addView(menuIcon);
+
+            // Custom dialog untuk opsi Edit dan Hapus
+            menuIcon.setOnClickListener(view -> {
+                Dialog dialog = new Dialog(PendidikanActivity.this);
+                dialog.setContentView(R.layout.dialog_menu);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                // Opsi Edit
+                LinearLayout itemEdit = dialog.findViewById(R.id.menu_edit);
+                if (itemEdit != null) {
+                    itemEdit.setOnClickListener(v -> {
+                        if (pendidikan.getId() != 0) {
+                            Intent intent = new Intent(PendidikanActivity.this, EditPendidikanActivity.class);
+                            intent.putExtra("pendidikanId", String.valueOf(pendidikan.getId()));
+                            intent.putExtra("pendidikanNama", pendidikan.getNama());
+                            intent.putExtra("pendidikanDeskripsi", pendidikan.getDescription());
+                            Log.d("PendidikanActivity", "Launching EditPendidikanActivity with pendidikanId: " + pendidikan.getId());
+                            startActivityForResult(intent, REQUEST_CODE_EDIT);
+                            dialog.dismiss();
+                        } else {
+                            Log.e("PendidikanActivity", "ID pendidikan tidak valid: " + pendidikan.getId());
+                            Toast.makeText(PendidikanActivity.this, "ID pendidikan tidak valid", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                // Opsi Hapus
+                LinearLayout itemHapus = dialog.findViewById(R.id.itemHapus);
+                if (itemHapus != null) {
+                    itemHapus.setOnClickListener(v -> {
+                        if (pendidikan.getId() != 0) {
+                            new AlertDialog.Builder(PendidikanActivity.this)
+                                    .setTitle("Konfirmasi Hapus")
+                                    .setMessage("Apakah Anda yakin ingin menghapus " + (pendidikan.getNama() != null ? pendidikan.getNama() : "pendidikan ini") + "?")
+                                    .setPositiveButton("Ya", (dialogConfirm, which) -> {
+                                        String token = getToken();
+                                        if (!token.isEmpty()) {
+                                            apiService.deletePendidikan("Bearer " + token, pendidikan.getId()).enqueue(new Callback<Void>() {
+                                                @Override
+                                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                                    if (response.isSuccessful()) {
+                                                        Toast.makeText(PendidikanActivity.this, "Pendidikan " + (pendidikan.getNama() != null ? pendidikan.getNama() : "") + " berhasil dihapus", Toast.LENGTH_SHORT).show();
+                                                        fetchPendidikan();
+                                                    } else {
+                                                        Toast.makeText(PendidikanActivity.this, "Gagal menghapus: " + response.code(), Toast.LENGTH_SHORT).show();
+                                                        Log.e("DeletePendidikan", "Error Code: " + response.code());
+                                                        if (response.errorBody() != null) {
+                                                            try {
+                                                                Log.e("DeletePendidikan", "Error Body: " + response.errorBody().string());
+                                                            } catch (Exception e) {
+                                                                Log.e("DeletePendidikan", "Error reading error body: " + e.getMessage());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<Void> call, Throwable t) {
+                                                    Toast.makeText(PendidikanActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    Log.e("DeletePendidikan", "onFailure: " + t.getMessage(), t);
+                                                }
+                                            });
+                                        } else {
+                                            Toast.makeText(PendidikanActivity.this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
+                                        }
+                                        dialog.dismiss();
+                                    })
+                                    .setNegativeButton("Tidak", (dialogConfirm, which) -> dialogConfirm.dismiss())
+                                    .show();
+                        } else {
+                            Toast.makeText(PendidikanActivity.this, "ID pendidikan tidak valid", Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    });
+                }
+
+                dialog.show();
+            });
+
+            // Tambahkan tag untuk identifikasi card dan TextView
+            card.setTag(String.valueOf(pendidikan.getId()));
+            tvNama.setTag("nama_" + pendidikan.getId());
+
             // Add to Grid
             gridPendidikan.addView(card);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK && data != null) {
+            String pendidikanId = data.getStringExtra("pendidikanId");
+            String namaBaru = data.getStringExtra("namaBaru");
+            String deskripsiBaru = data.getStringExtra("deskripsiBaru");
+
+            // Perbarui UI hanya untuk card yang diedit
+            for (int i = 0; i < gridPendidikan.getChildCount(); i++) {
+                LinearLayout card = (LinearLayout) gridPendidikan.getChildAt(i);
+                if (card.getTag() != null && card.getTag().equals(pendidikanId)) {
+                    TextView tvNama = card.findViewWithTag("nama_" + pendidikanId);
+                    if (tvNama != null) {
+                        tvNama.setText(namaBaru != null ? namaBaru : "Nama tidak tersedia");
+                    }
+                    break;
+                }
+            }
+
+            Log.d("PendidikanActivity", "Updated - ID: " + pendidikanId + ", Nama: " + namaBaru);
         }
     }
 }

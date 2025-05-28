@@ -3,21 +3,27 @@ package com.example.brainquiz;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.Dialog;
+import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.brainquiz.filter.Kategori;
 import com.example.brainquiz.network.ApiService;
+import com.example.brainquiz.KategoriResponse;
 
 import java.util.List;
 
@@ -31,8 +37,10 @@ public class KategoriActivity extends AppCompatActivity {
 
     private GridLayout gridKategori;
     private Button btnTambahKategori;
+    private EditText searchBar; // Tambahkan searchBar yang sesuai dengan layout
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
+    private static final int REQUEST_CODE_EDIT = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,7 @@ public class KategoriActivity extends AppCompatActivity {
         // Initialize views
         gridKategori = findViewById(R.id.gridKategori);
         btnTambahKategori = findViewById(R.id.btnTambahKategori);
+        searchBar = findViewById(R.id.searchBar); // Inisialisasi searchBar
 
         // Initialize Retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -68,7 +77,6 @@ public class KategoriActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Refresh data when returning from TambahKategoriActivity
         fetchKategori();
     }
 
@@ -162,20 +170,141 @@ public class KategoriActivity extends AppCompatActivity {
             icon.setColorFilter(Color.WHITE);
             card.addView(icon);
 
-            // TextView
+            // TextView nama
             TextView tvNama = new TextView(this);
             tvNama.setLayoutParams(new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
-            tvNama.setText(kategori.getNama());
+            String nama = kategori.getNama() != null ? kategori.getNama() : "Nama tidak tersedia";
+            tvNama.setText(nama);
             tvNama.setTextColor(Color.WHITE);
             tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             tvNama.setPadding(0, (int) (8 * density), 0, 0);
             card.addView(tvNama);
 
+            // Tambahkan tombol opsi (ikon tiga titik)
+            ImageView menuIcon = new ImageView(this);
+            menuIcon.setImageResource(R.drawable.ic_more_vert);
+            menuIcon.setColorFilter(Color.WHITE);
+
+            LinearLayout.LayoutParams menuParams = new LinearLayout.LayoutParams(
+                    (int) (24 * density),
+                    (int) (24 * density)
+            );
+            menuParams.gravity = Gravity.END;
+            menuParams.topMargin = (int) (8 * density);
+            menuIcon.setLayoutParams(menuParams);
+            card.addView(menuIcon);
+
+            // Custom dialog untuk opsi Edit dan Hapus
+            menuIcon.setOnClickListener(view -> {
+                Dialog dialog = new Dialog(KategoriActivity.this);
+                dialog.setContentView(R.layout.dialog_menu);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+                // Opsi Edit
+                LinearLayout itemEdit = dialog.findViewById(R.id.menu_edit);
+                if (itemEdit != null) {
+                    itemEdit.setOnClickListener(v -> {
+                        if (kategori.getId() != 0) {
+                            Intent intent = new Intent(KategoriActivity.this, EditKategoriActivity.class);
+                            intent.putExtra("kategoriId", String.valueOf(kategori.getId()));
+                            intent.putExtra("kategoriNama", kategori.getNama());
+                            intent.putExtra("kategoriDeskripsi", kategori.getDescription());
+                            Log.d("KategoriActivity", "Launching EditKategoriActivity with kategoriId: " + kategori.getId());
+                            startActivityForResult(intent, REQUEST_CODE_EDIT);
+                            dialog.dismiss();
+                        } else {
+                            Log.e("KategoriActivity", "ID kategori tidak valid: " + kategori.getId());
+                            Toast.makeText(KategoriActivity.this, "ID kategori tidak valid", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                // Opsi Hapus
+                LinearLayout itemHapus = dialog.findViewById(R.id.itemHapus);
+                if (itemHapus != null) {
+                    itemHapus.setOnClickListener(v -> {
+                        if (kategori.getId() != 0) {
+                            new AlertDialog.Builder(KategoriActivity.this)
+                                    .setTitle("Konfirmasi Hapus")
+                                    .setMessage("Apakah Anda yakin ingin menghapus " + (kategori.getNama() != null ? kategori.getNama() : "kategori ini") + "?")
+                                    .setPositiveButton("Ya", (dialogConfirm, which) -> {
+                                        String token = getToken();
+                                        if (!token.isEmpty()) {
+                                            apiService.deleteKategori("Bearer " + token, kategori.getId()).enqueue(new Callback<Void>() {
+                                                @Override
+                                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                                    if (response.isSuccessful()) {
+                                                        Toast.makeText(KategoriActivity.this, "Kategori " + (kategori.getNama() != null ? kategori.getNama() : "") + " berhasil dihapus", Toast.LENGTH_SHORT).show();
+                                                        fetchKategori();
+                                                    } else {
+                                                        Toast.makeText(KategoriActivity.this, "Gagal menghapus: " + response.code(), Toast.LENGTH_SHORT).show();
+                                                        Log.e("DeleteKategori", "Error Code: " + response.code());
+                                                        if (response.errorBody() != null) {
+                                                            try {
+                                                                Log.e("DeleteKategori", "Error Body: " + response.errorBody().string());
+                                                            } catch (Exception e) {
+                                                                Log.e("DeleteKategori", "Error reading error body: " + e.getMessage());
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onFailure(Call<Void> call, Throwable t) {
+                                                    Toast.makeText(KategoriActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    Log.e("DeleteKategori", "onFailure: " + t.getMessage(), t);
+                                                }
+                                            });
+                                        } else {
+                                            Toast.makeText(KategoriActivity.this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
+                                        }
+                                        dialog.dismiss();
+                                    })
+                                    .setNegativeButton("Tidak", (dialogConfirm, which) -> dialogConfirm.dismiss())
+                                    .show();
+                        } else {
+                            Toast.makeText(KategoriActivity.this, "ID kategori tidak valid", Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    });
+                }
+
+                dialog.show();
+            });
+
+            // Tambahkan tag untuk identifikasi card dan TextView
+            card.setTag(String.valueOf(kategori.getId()));
+            tvNama.setTag("nama_" + kategori.getId());
+
             // Add to Grid
             gridKategori.addView(card);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK && data != null) {
+            String kategoriId = data.getStringExtra("kategoriId");
+            String namaBaru = data.getStringExtra("namaBaru");
+            String deskripsiBaru = data.getStringExtra("deskripsiBaru");
+
+            // Perbarui UI hanya untuk card yang diedit
+            for (int i = 0; i < gridKategori.getChildCount(); i++) {
+                LinearLayout card = (LinearLayout) gridKategori.getChildAt(i);
+                if (card.getTag() != null && card.getTag().equals(kategoriId)) {
+                    TextView tvNama = card.findViewWithTag("nama_" + kategoriId);
+                    if (tvNama != null) {
+                        tvNama.setText(namaBaru != null ? namaBaru : "Nama tidak tersedia");
+                    }
+                    break;
+                }
+            }
+
+            Log.d("KategoriActivity", "Updated - ID: " + kategoriId + ", Nama: " + namaBaru);
         }
     }
 }

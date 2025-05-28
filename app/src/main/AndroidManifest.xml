@@ -57,6 +57,12 @@
             android:name=".EditKelasActivity"
             android:exported="false" />
         <activity
+            android:name=".EditKategoriActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditPendidikanActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

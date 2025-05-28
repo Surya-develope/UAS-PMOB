@@ -53,11 +53,23 @@ public interface ApiService {
     @POST("pendidikan/add-pendidikan")
     Call<PendidikanResponse> addPendidikan(@Header("Authorization") String token, @Body Pendidikan pendidikan);
 
+    @DELETE("pendidikan/delete-pendidikan/{id}")
+    Call<Void> deletePendidikan(@Header("Authorization") String token, @Path("id") int id);
+
+    @PATCH("pendidikan/update-pendidikan/{id}")
+    Call<PendidikanResponse> updatePendidikan(@Header("Authorization") String token, @Path("id") int id, @Body Pendidikan pendidikan);
+
     @GET("kategori/get-kategori")
     Call<KategoriResponse> getKategori(@Header("Authorization") String token);
 
     @POST("kategori/add-kategori")
     Call<KategoriResponse> addKategori(@Header("Authorization") String token, @Body Kategori kategori);
+
+    @PATCH("kategori/update-kategori/{id}")
+    Call<KategoriResponse> updateKategori(@Header("Authorization") String token, @Path("id") int id, @Body Kategori kategori);
+
+    @DELETE("kategori/delete-kategori/{id}")
+    Call<Void> deleteKategori(@Header("Authorization") String token, @Path("id") int id);
 
     @GET("kelas/get-kelas")
     Call<KelasResponse> getKelas(@Header("Authorization") String token);

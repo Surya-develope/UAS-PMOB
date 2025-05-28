@@ -40,7 +40,7 @@
 
         <!-- Search -->
         <EditText
-            android:id="@+id/et_cari_pendidikan"
+            android:id="@+id/searchBar"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:hint="Search"
@@ -51,7 +51,7 @@
 
         <!-- Tombol tambah -->
         <Button
-            android:id="@+id/btn_tambah_pendidikan"
+            android:id="@+id/btnTambahPendidikan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -64,7 +64,7 @@
 
         <!-- Grid Pendidikan -->
         <GridLayout
-            android:id="@+id/grid_pendidikan"
+            android:id="@+id/gridPendidikan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
