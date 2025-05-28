@@ -16,13 +16,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.app.Dialog;
+import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Tingkatan;
 import com.example.brainquiz.network.ApiService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,11 +34,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TingkatanActivity extends AppCompatActivity {
 
+    private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
+    private static final int REQUEST_CODE_EDIT = 100; // Kode untuk startActivityForResult
+
     private GridLayout gridTingkatan;
     private Button btnTambahTingkatan;
     private EditText etCariTingkatan;
     private ApiService apiService;
-    private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
+    private List<Tingkatan> tingkatanList = new ArrayList<>(); // Simpan daftar tingkatan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +101,8 @@ public class TingkatanActivity extends AppCompatActivity {
                 Log.d("TingkatanActivity", "Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null) {
                     List<Tingkatan> data = response.body().getData();
+                    tingkatanList.clear();
+                    tingkatanList.addAll(data);
                     if (data.isEmpty()) {
                         Toast.makeText(TingkatanActivity.this, "Tidak ada tingkatan", Toast.LENGTH_SHORT).show();
                     } else {
@@ -124,13 +130,13 @@ public class TingkatanActivity extends AppCompatActivity {
         });
     }
 
-    private void tampilantingkatan(List<Tingkatan> listtingkatan) {
+    private void tampilantingkatan(List<Tingkatan> listTingkatan) {
         gridTingkatan.removeAllViews();
         gridTingkatan.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
 
-        for (Tingkatan tingkatan : listtingkatan) {
+        for (Tingkatan tingkatan : listTingkatan) {
             // Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -174,8 +180,9 @@ public class TingkatanActivity extends AppCompatActivity {
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
             ));
-            tvNama.setText(tingkatan.getNama() != null ? tingkatan.getNama() : "Tidak ada nama");
-            tvNama.setTextColor(Color.WHITE);
+            String nama = tingkatan.getNama() != null ? tingkatan.getNama() : "Nama tidak tersedia";
+            tvNama.setText(nama);
+            tvNama.setTextColor(Color.WHITE); // Pastikan kontras dengan latar belakang
             tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
             tvNama.setPadding(0, (int) (8 * density), 0, 0);
             card.addView(tvNama);
@@ -203,11 +210,12 @@ public class TingkatanActivity extends AppCompatActivity {
                 LinearLayout itemEdit = dialog.findViewById(R.id.menu_edit);
                 if (itemEdit != null) {
                     itemEdit.setOnClickListener(v -> {
-                        if (tingkatan.getId() != null && !tingkatan.getId().isEmpty()) {
+                        if (tingkatan.getId() != 0) {
                             Intent intent = new Intent(TingkatanActivity.this, EditActivity.class);
-                            intent.putExtra("tingkatanId", tingkatan.getId());
+                            intent.putExtra("tingkatanId", String.valueOf(tingkatan.getId()));
                             intent.putExtra("tingkatanNama", tingkatan.getNama());
-                            startActivity(intent);
+                            intent.putExtra("tingkatanDeskripsi", tingkatan.getDescription());
+                            startActivityForResult(intent, REQUEST_CODE_EDIT);
                             dialog.dismiss();
                         } else {
                             Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
@@ -219,50 +227,45 @@ public class TingkatanActivity extends AppCompatActivity {
                 LinearLayout itemHapus = dialog.findViewById(R.id.itemHapus);
                 if (itemHapus != null) {
                     itemHapus.setOnClickListener(v -> {
-                        if (tingkatan.getId() != null && !tingkatan.getId().isEmpty()) {
-                            try {
-                                int id = Integer.parseInt(tingkatan.getId()); // Konversi String ke int
-                                new android.app.AlertDialog.Builder(TingkatanActivity.this)
-                                        .setTitle("Konfirmasi Hapus")
-                                        .setMessage("Apakah Anda yakin ingin menghapus " + (tingkatan.getNama() != null ? tingkatan.getNama() : "tingkatan ini") + "?")
-                                        .setPositiveButton("Ya", (dialogConfirm, which) -> {
-                                            String token = getToken();
-                                            if (!token.isEmpty()) {
-                                                apiService.deleteTingkatan("Bearer " + token, id).enqueue(new Callback<Void>() {
-                                                    @Override
-                                                    public void onResponse(Call<Void> call, Response<Void> response) {
-                                                        if (response.isSuccessful()) {
-                                                            Toast.makeText(TingkatanActivity.this, "Tingkatan " + (tingkatan.getNama() != null ? tingkatan.getNama() : "") + " berhasil dihapus", Toast.LENGTH_SHORT).show();
-                                                            fetchTingkatan();
-                                                        } else {
-                                                            Toast.makeText(TingkatanActivity.this, "Gagal menghapus: " + response.code(), Toast.LENGTH_SHORT).show();
-                                                            Log.e("DeleteTingkatan", "Error Code: " + response.code());
-                                                            if (response.errorBody() != null) {
-                                                                try {
-                                                                    Log.e("DeleteTingkatan", "Error Body: " + response.errorBody().string());
-                                                                } catch (Exception e) {
-                                                                    Log.e("DeleteTingkatan", "Error reading error body: " + e.getMessage());
-                                                                }
+                        if (tingkatan.getId() != 0) {
+                            new AlertDialog.Builder(TingkatanActivity.this)
+                                    .setTitle("Konfirmasi Hapus")
+                                    .setMessage("Apakah Anda yakin ingin menghapus " + (tingkatan.getNama() != null ? tingkatan.getNama() : "tingkatan ini") + "?")
+                                    .setPositiveButton("Ya", (dialogConfirm, which) -> {
+                                        String token = getToken();
+                                        if (!token.isEmpty()) {
+                                            apiService.deleteTingkatan("Bearer " + token, tingkatan.getId()).enqueue(new Callback<Void>() {
+                                                @Override
+                                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                                    if (response.isSuccessful()) {
+                                                        Toast.makeText(TingkatanActivity.this, "Tingkatan " + (tingkatan.getNama() != null ? tingkatan.getNama() : "") + " berhasil dihapus", Toast.LENGTH_SHORT).show();
+                                                        fetchTingkatan();
+                                                    } else {
+                                                        Toast.makeText(TingkatanActivity.this, "Gagal menghapus: " + response.code(), Toast.LENGTH_SHORT).show();
+                                                        Log.e("DeleteTingkatan", "Error Code: " + response.code());
+                                                        if (response.errorBody() != null) {
+                                                            try {
+                                                                Log.e("DeleteTingkatan", "Error Body: " + response.errorBody().string());
+                                                            } catch (Exception e) {
+                                                                Log.e("DeleteTingkatan", "Error reading error body: " + e.getMessage());
                                                             }
                                                         }
                                                     }
+                                                }
 
-                                                    @Override
-                                                    public void onFailure(Call<Void> call, Throwable t) {
-                                                        Toast.makeText(TingkatanActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                                                        Log.e("DeleteTingkatan", "onFailure: " + t.getMessage(), t);
-                                                    }
-                                                });
-                                            } else {
-                                                Toast.makeText(TingkatanActivity.this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
-                                            }
-                                            dialog.dismiss();
-                                        })
-                                        .setNegativeButton("Tidak", (dialogConfirm, which) -> dialogConfirm.dismiss())
-                                        .show();
-                            } catch (NumberFormatException e) {
-                                Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
-                            }
+                                                @Override
+                                                public void onFailure(Call<Void> call, Throwable t) {
+                                                    Toast.makeText(TingkatanActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                                    Log.e("DeleteTingkatan", "onFailure: " + t.getMessage(), t);
+                                                }
+                                            });
+                                        } else {
+                                            Toast.makeText(TingkatanActivity.this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
+                                        }
+                                        dialog.dismiss();
+                                    })
+                                    .setNegativeButton("Tidak", (dialogConfirm, which) -> dialogConfirm.dismiss())
+                                    .show();
                         } else {
                             Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
                         }
@@ -273,8 +276,51 @@ public class TingkatanActivity extends AppCompatActivity {
                 dialog.show();
             });
 
+            // Tambahkan tag untuk identifikasi card dan TextView
+            card.setTag(String.valueOf(tingkatan.getId()));
+            tvNama.setTag("nama_" + tingkatan.getId());
+
             // Add to Grid
             gridTingkatan.addView(card);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_EDIT && resultCode == RESULT_OK && data != null) {
+            // Ambil data yang diedit dari EditActivity
+            String tingkatanId = data.getStringExtra("tingkatanId");
+            String namaBaru = data.getStringExtra("namaBaru");
+            String deskripsiBaru = data.getStringExtra("deskripsiBaru");
+
+            // Perbarui data di tingkatanList
+            for (Tingkatan tingkatan : tingkatanList) {
+                try {
+                    int id = Integer.parseInt(tingkatanId); // Konversi tingkatanId ke int
+                    if (tingkatan.getId() == id) {
+                        tingkatan.setNama(namaBaru);
+                        tingkatan.setDescription(deskripsiBaru);
+                        break;
+                    }
+                } catch (NumberFormatException e) {
+                    Log.e("TingkatanActivity", "Invalid ID format: " + tingkatanId);
+                }
+            }
+
+            // Perbarui UI hanya untuk card yang diedit
+            for (int i = 0; i < gridTingkatan.getChildCount(); i++) {
+                LinearLayout card = (LinearLayout) gridTingkatan.getChildAt(i);
+                if (card.getTag() != null && card.getTag().equals(tingkatanId)) {
+                    TextView tvNama = card.findViewWithTag("nama_" + tingkatanId);
+                    if (tvNama != null) {
+                        tvNama.setText(namaBaru != null ? namaBaru : "Tidak ada nama");
+                    }
+                    break;
+                }
+            }
+
+            Log.d("TingkatanActivity", "Updated - ID: " + tingkatanId + ", Nama: " + namaBaru);
         }
     }
 }

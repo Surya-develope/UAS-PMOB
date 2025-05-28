@@ -1,48 +1,36 @@
 package com.example.brainquiz.filter;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Tingkatan {
     @SerializedName("ID")
-    private String id; // Included for deserialization from GET responses, excluded from POST
+    private int id; // Ubah menjadi int jika server mengharapkan integer
 
     @SerializedName("name")
-    @Expose
-    private String name; // Included in POST request body
+    private String nama;
 
     @SerializedName("description")
-    @Expose
-    private String description; // Included in POST request body
+    private String description;
 
-    // Default constructor
-    public Tingkatan() {
-        this.id = "";
-        this.name = "";
-        this.description = "";
+    // Getter dan Setter
+    public int getId() {
+        return id;
     }
 
-    // Getter and Setter for id
-    public String getId() {
-        return id != null ? id : "";
-    }
-
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    // Getter and Setter for name (aliased as nama for compatibility)
     public String getNama() {
-        return name != null ? name : "";
+        return nama;
     }
 
-    public void setNama(String name) {
-        this.name = name;
+    public void setNama(String nama) {
+        this.nama = nama;
     }
 
-    // Getter and Setter for description
     public String getDescription() {
-        return description != null ? description : "";
+        return description;
     }
 
     public void setDescription(String description) {
