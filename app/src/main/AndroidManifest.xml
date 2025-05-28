@@ -54,6 +54,9 @@
             android:name=".EditActivity"
             android:exported="false" />
         <activity
+            android:name=".EditKelasActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

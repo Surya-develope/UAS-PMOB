@@ -15,7 +15,7 @@
             android:id="@+id/tvJudul"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Edit Tingkatan: Nama"
+            android:text="Edit Kelas: Nama"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#00796B"
@@ -34,7 +34,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nama"
+                android:text="Nama Kelas"
                 android:textColor="#00796B"
                 android:layout_marginBottom="4dp" />
 
@@ -44,14 +44,14 @@
                 android:layout_height="40dp"
                 android:background="@drawable/bg_input_border"
                 android:paddingHorizontal="12dp"
-                android:hint="Masukkan nama"
+                android:hint="Masukkan nama kelas"
                 android:textColor="#000000"
                 android:textColorHint="#999" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Deskripsi"
+                android:text="Deskripsi Kelas"
                 android:textColor="#00796B"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="4dp" />
@@ -63,7 +63,7 @@
                 android:gravity="top"
                 android:background="@drawable/bg_input_border"
                 android:padding="12dp"
-                android:hint="Masukkan deskripsi"
+                android:hint="Masukkan deskripsi kelas"
                 android:textColor="#000000"
                 android:textColorHint="#999" />
         </LinearLayout>

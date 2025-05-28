@@ -65,6 +65,12 @@ public interface ApiService {
     @POST("kelas/add-kelas")
     Call<KelasResponse> addKelas(@Header("Authorization") String token, @Body Kelas kelas);
 
+    @DELETE("kelas/delete-kelas/{id}")
+    Call<Void> deleteKelas(@Header("Authorization") String token, @Path("id") int id);
+
+    @PATCH("kelas/update-kelas/{id}")
+    Call<KelasResponse> updateKelas(@Header("Authorization") String token, @Path("id") int id, @Body Kelas kelas);
+
     @GET("kuis/get-kuis")
     Call<KuisResponse> getKuis(@Header("Authorization") String token);
 }
