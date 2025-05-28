@@ -11,6 +11,8 @@ import androidx.appcompat.widget.AppCompatButton;
 
 import com.example.brainquiz.filter.Tingkatan;
 import com.example.brainquiz.network.ApiService;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,10 +42,14 @@ public class TambahTingkatanActivity extends AppCompatActivity {
         etDeskripsi = findViewById(R.id.etDeskripsi);
         btnSimpan = findViewById(R.id.btnSimpan);
 
-        // Initialize Retrofit
+        // Initialize Retrofit with custom Gson
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation() // Ensure fields without @Expose are excluded
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson)) // Use the custom Gson
                 .build();
         apiService = retrofit.create(ApiService.class);
 
@@ -60,7 +66,8 @@ public class TambahTingkatanActivity extends AppCompatActivity {
         String nama = etNama.getText().toString().trim();
         String deskripsi = etDeskripsi.getText().toString().trim();
 
-        // Validate inputs
+        Log.d("TambahTingkatanActivity", "Input Values: nama=" + nama + ", deskripsi=" + deskripsi);
+
         if (nama.isEmpty() || deskripsi.isEmpty()) {
             Toast.makeText(this, "Nama dan deskripsi harus diisi", Toast.LENGTH_SHORT).show();
             return;
@@ -72,28 +79,45 @@ public class TambahTingkatanActivity extends AppCompatActivity {
             return;
         }
 
-        // Create Tingkatan object
         Tingkatan tingkatan = new Tingkatan();
         tingkatan.setNama(nama);
         tingkatan.setDescription(deskripsi);
+
+        // Log the JSON being sent
+        Gson gson = new GsonBuilder().create(); // Use a new Gson instance for logging to see raw output
+        String jsonBody = gson.toJson(tingkatan);
+        Log.e("TambahTingkatanActivity", "Request Body: " + jsonBody);
+        Log.d("TambahTingkatanActivity", "Token: " + token);
 
         // Make API call
         apiService.addTingkatan("Bearer " + token, tingkatan).enqueue(new Callback<TingkatanResponse>() {
             @Override
             public void onResponse(Call<TingkatanResponse> call, Response<TingkatanResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    Toast.makeText(TambahTingkatanActivity.this, "Tingkatan berhasil ditambahkan", Toast.LENGTH_SHORT).show();
-                    finish(); // Return to TingkatanActivity
+                Log.d("TambahTingkatanActivity", "Response Code: " + response.code());
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        Log.d("TambahTingkatanActivity", "Response Body: " + new Gson().toJson(response.body()));
+                        String message = response.body().getMessage() != null ? response.body().getMessage() : "Tingkatan berhasil ditambahkan";
+                        Toast.makeText(TambahTingkatanActivity.this, message, Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Log.e("TambahTingkatanActivity", "Response body is null");
+                        Toast.makeText(TambahTingkatanActivity.this, "Gagal menambahkan tingkatan: Respon kosong", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Log.e("TambahTingkatanActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
                         try {
-                            Log.e("TambahTingkatanActivity", "Error Body: " + response.errorBody().string());
+                            String errorBody = response.errorBody().string();
+                            Log.e("TambahTingkatanActivity", "Error Body: " + errorBody);
+                            Toast.makeText(TambahTingkatanActivity.this, "Gagal menambahkan tingkatan: " + errorBody, Toast.LENGTH_LONG).show();
                         } catch (Exception e) {
                             Log.e("TambahTingkatanActivity", "Error reading error body: " + e.getMessage());
+                            Toast.makeText(TambahTingkatanActivity.this, "Gagal menambahkan tingkatan: " + response.code(), Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        Toast.makeText(TambahTingkatanActivity.this, "Gagal menambahkan tingkatan: " + response.code(), Toast.LENGTH_SHORT).show();
                     }
-                    Toast.makeText(TambahTingkatanActivity.this, "Gagal menambahkan tingkatan: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 

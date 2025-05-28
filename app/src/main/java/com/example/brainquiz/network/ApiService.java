@@ -17,9 +17,12 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface ApiService {
 
@@ -37,6 +40,12 @@ public interface ApiService {
 
     @POST("tingkatan/add-tingkatan")
     Call<TingkatanResponse> addTingkatan(@Header("Authorization") String token, @Body Tingkatan tingkatan);
+
+    @PATCH("tingkatan/update-tingkatan/{id}")
+    Call<TingkatanResponse> updateTingkatan(@Header("Authorization") String token, @Path("id") int id, @Body Tingkatan tingkatan);
+
+    @DELETE("tingkatan/delete-tingkatan/{id}")
+    Call<Void> deleteTingkatan(@Header("Authorization") String token, @Path("id") int id);
 
     @GET("pendidikan/get-pendidikan")
     Call<PendidikanResponse> getPendidikan(@Header("Authorization") String token);

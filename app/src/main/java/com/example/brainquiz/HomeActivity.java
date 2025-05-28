@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.brainquiz.network.ApiService;
 import com.example.brainquiz.filter.Tingkatan;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -71,6 +72,8 @@ public class HomeActivity extends AppCompatActivity {
         menuJawabSoal.setOnClickListener(v -> showToast("Menu Jawab Soal diklik"));
         menuHasilKuis.setOnClickListener(v -> showToast("Menu Hasil Kuis diklik"));
 
+        // Fetch initial data
+        fetchTingkatan();
     }
 
     // Ambil token dari SharedPreferences
@@ -101,18 +104,27 @@ public class HomeActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Tingkatan> list = response.body().getData();
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<Tingkatan> list = response.body().getData() != null ? response.body().getData() : new ArrayList<>();
                     showToast("Dapat " + list.size() + " tingkatan");
                 } else {
-                    Log.e("fetchTingkatan", "Error body: " + response.errorBody().toString());
-                    showToast("Gagal mengambil data tingkatan");
+                    String errorBody = "Error body not available";
+                    if (response.errorBody() != null) {
+                        try {
+                            errorBody = response.errorBody().string();
+                        } catch (Exception e) {
+                            Log.e("fetchTingkatan", "Error reading error body: " + e.getMessage());
+                        }
+                    }
+                    Log.e("fetchTingkatan", "Error body: " + errorBody);
+                    showToast("Gagal mengambil data tingkatan: " + response.code());
                 }
             }
 
             @Override
             public void onFailure(Call<TingkatanResponse> call, Throwable t) {
                 showToast("Error: " + t.getMessage());
+                Log.e("fetchTingkatan", "onFailure: " + t.getMessage(), t);
             }
         });
     }
@@ -121,6 +133,4 @@ public class HomeActivity extends AppCompatActivity {
     private void showToast(String pesan) {
         Toast.makeText(this, pesan, Toast.LENGTH_SHORT).show();
     }
-
-
 }
