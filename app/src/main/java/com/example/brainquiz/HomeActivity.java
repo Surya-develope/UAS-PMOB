@@ -49,10 +49,12 @@ public class HomeActivity extends AppCompatActivity {
         menuKategori = findViewById(R.id.menu_kategori);
         menuKelas = findViewById(R.id.menu_kelas);
         menuPendidikan = findViewById(R.id.menu_pendidikan);
-        menuKuis = findViewById(R.id.menu_kuis);
-        menuSoal = findViewById(R.id.menu_soal);
-        menuJawabSoal = findViewById(R.id.menu_jawab_soal);
-        menuHasilKuis = findViewById(R.id.menu_hasil_kuis);
+
+        // Inisialisasi navigation
+        LinearLayout navHome = findViewById(R.id.nav_home);
+        LinearLayout navKuis = findViewById(R.id.nav_kuis);
+        LinearLayout navJawabSoal = findViewById(R.id.nav_jawab_soal);
+        LinearLayout navHasil = findViewById(R.id.nav_hasil);
 
         // Setup Retrofit
         Retrofit retrofit = new Retrofit.Builder()
@@ -62,15 +64,29 @@ public class HomeActivity extends AppCompatActivity {
 
         apiService = retrofit.create(ApiService.class);
 
-        // Event Listener
+        // Event Listener for menu cards
         menuTingkatan.setOnClickListener(v -> startActivity(new Intent(this, TingkatanActivity.class)));
         menuKategori.setOnClickListener(v -> startActivity(new Intent(this, KategoriActivity.class)));
         menuKelas.setOnClickListener(v -> startActivity(new Intent(this, KelasActivity.class)));
         menuPendidikan.setOnClickListener(v -> startActivity(new Intent(this, PendidikanActivity.class)));
-        menuKuis.setOnClickListener(v -> startActivity(new Intent(this, KuisActivity.class)));
-        menuSoal.setOnClickListener(v -> showToast("Menu Soal diklik"));
-        menuJawabSoal.setOnClickListener(v -> showToast("Menu Jawab Soal diklik"));
-        menuHasilKuis.setOnClickListener(v -> showToast("Menu Hasil Kuis diklik"));
+
+        // Event Listener for navbar
+        navHome.setOnClickListener(v -> {
+            // Already in HomeActivity, do nothing or refresh
+            showToast("Anda sudah berada di Home");
+        });
+
+        navKuis.setOnClickListener(v -> {
+            startActivity(new Intent(this, KuisActivity.class));
+        });
+
+        navJawabSoal.setOnClickListener(v -> {
+            startActivity(new Intent(this, JawabSoalActivity.class));
+        });
+
+        navHasil.setOnClickListener(v -> {
+            startActivity(new Intent(this, HasilKuisActivity.class));
+        });
 
         // Fetch initial data
         fetchTingkatan();

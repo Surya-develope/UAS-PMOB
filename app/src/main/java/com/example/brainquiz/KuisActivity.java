@@ -154,6 +154,8 @@ public class KuisActivity extends AppCompatActivity {
         gridLayout.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int cardWidth = (screenWidth / 2) - (int)(32 * density); // Adjust for better sizing
 
         for (Kuis kuisItem : kuis) {
             if (kuisItem == null) continue;
@@ -165,9 +167,9 @@ public class KuisActivity extends AppCompatActivity {
 
             // Layout Parameters
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 0;
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
+            params.width = cardWidth;
+            params.height = (int)(160 * density); // Fixed height that looks good on most devices
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
             params.setMargins(
                     (int) (8 * density),
                     (int) (8 * density),
@@ -183,41 +185,53 @@ public class KuisActivity extends AppCompatActivity {
                     (int) (16 * density),
                     (int) (16 * density)
             );
-            try {
-                card.setBackgroundResource(R.drawable.bg_card);
-            } catch (Exception e) {
-                Log.e("KuisActivity", "Error setting bg_card: " + e.getMessage());
-                card.setBackgroundColor(Color.GRAY);
-            }
-            card.setElevation(4 * density);
+            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
+
+            // Create a layout for the icon and text
+            LinearLayout contentLayout = new LinearLayout(this);
+            contentLayout.setOrientation(LinearLayout.VERTICAL);
+            contentLayout.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            contentLayout.setLayoutParams(contentParams);
 
             // ImageView
             ImageView icon = new ImageView(this);
-            icon.setLayoutParams(new LinearLayout.LayoutParams(
-                    (int) (48 * density),
-                    (int) (48 * density)
-            ));
+            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(
+                    (int) (64 * density),
+                    (int) (64 * density)
+            );
+            iconParams.gravity = Gravity.CENTER;
+            icon.setLayoutParams(iconParams);
             try {
                 icon.setImageResource(R.drawable.question);
             } catch (Exception e) {
                 Log.e("KuisActivity", "Error setting question drawable: " + e.getMessage());
             }
             icon.setColorFilter(Color.WHITE);
-            card.addView(icon);
+            contentLayout.addView(icon);
 
-            // TextView
+            // TextView for title
             TextView tvTitle = new TextView(this);
-            tvTitle.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            );
+            textParams.gravity = Gravity.CENTER;
+            textParams.topMargin = (int) (12 * density);
+            tvTitle.setLayoutParams(textParams);
+
             String title = kuisItem.getTitle();
             tvTitle.setText(title != null ? title : "Kuis Tanpa Judul");
             tvTitle.setTextColor(Color.WHITE);
-            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
             tvTitle.setTypeface(null, Typeface.BOLD);
-            tvTitle.setPadding(0, (int) (8 * density), 0, 0);
-            card.addView(tvTitle);
+            contentLayout.addView(tvTitle);
+
+            card.addView(contentLayout);
+
 
             // Click listener for card (Sementara hanya Toast)
             card.setOnClickListener(v -> {

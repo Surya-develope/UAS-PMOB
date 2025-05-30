@@ -21,6 +21,7 @@ import android.app.AlertDialog;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.brainquiz.filter.Kategori;
 import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.network.ApiService;
 
@@ -100,7 +101,7 @@ public class KelasActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Kelas> data = response.body().getData();
                     Toast.makeText(KelasActivity.this, "Dapat " + data.size() + " kelas", Toast.LENGTH_SHORT).show();
-                    tampilankelas(data); // Perbaiki nama metode
+                    tampilkanKategori(data); // Perbaiki nama metode
                 } else {
                     Log.e("KelasActivity", "Error " + response.code());
                     if (response.errorBody() != null) {
@@ -122,13 +123,15 @@ public class KelasActivity extends AppCompatActivity {
         });
     }
 
-    private void tampilankelas(List<Kelas> listKelas) {
+    private void tampilkanKategori(List<Kelas> listKategori) {
         gridLayout.removeAllViews();
         gridLayout.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int cardWidth = (screenWidth / 2) - (int)(32 * density); // Adjust for better sizing
 
-        for (Kelas kelas : listKelas) {
+        for (Kelas kelas : listKategori) {
             // Container Card
             LinearLayout card = new LinearLayout(this);
             card.setOrientation(LinearLayout.VERTICAL);
@@ -136,14 +139,14 @@ public class KelasActivity extends AppCompatActivity {
 
             // Layout Parameters
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 0;
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
+            params.width = cardWidth;
+            params.height = (int)(160 * density); // Fixed height that looks good on most devices
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
             params.setMargins(
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density)
+                    (int) (8 * density),
+                    (int) (8 * density),
+                    (int) (8 * density),
+                    (int) (8 * density)
             );
             card.setLayoutParams(params);
 
@@ -156,28 +159,46 @@ public class KelasActivity extends AppCompatActivity {
             );
             card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
+            // Create a layout for the icon and text
+            LinearLayout contentLayout = new LinearLayout(this);
+            contentLayout.setOrientation(LinearLayout.VERTICAL);
+            contentLayout.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            contentLayout.setLayoutParams(contentParams);
+
             // ImageView
             ImageView icon = new ImageView(this);
-            icon.setLayoutParams(new LinearLayout.LayoutParams(
-                    (int) (48 * density),
-                    (int) (48 * density)
-            ));
-            icon.setImageResource(R.drawable.ic_tingkatan);
+            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(
+                    (int) (64 * density),
+                    (int) (64 * density)
+            );
+            iconParams.gravity = Gravity.CENTER;
+            icon.setLayoutParams(iconParams);
+            icon.setImageResource(R.drawable.ic_kelas);
             icon.setColorFilter(Color.WHITE);
-            card.addView(icon);
+            contentLayout.addView(icon);
 
             // TextView nama
             TextView tvNama = new TextView(this);
-            tvNama.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            );
+            textParams.gravity = Gravity.CENTER;
+            textParams.topMargin = (int) (12 * density);
+            tvNama.setLayoutParams(textParams);
+
             String nama = kelas.getNama() != null ? kelas.getNama() : "Nama tidak tersedia";
             tvNama.setText(nama);
             tvNama.setTextColor(Color.WHITE);
-            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvNama.setPadding(0, (int) (8 * density), 0, 0);
-            card.addView(tvNama);
+            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            tvNama.setTypeface(null, Typeface.BOLD);
+            contentLayout.addView(tvNama);
+
+            card.addView(contentLayout);
 
             // Tambahkan tombol opsi (ikon tiga titik)
             ImageView menuIcon = new ImageView(this);
@@ -188,8 +209,7 @@ public class KelasActivity extends AppCompatActivity {
                     (int) (24 * density),
                     (int) (24 * density)
             );
-            menuParams.gravity = Gravity.END;
-            menuParams.topMargin = (int) (8 * density);
+            menuParams.gravity = Gravity.END | Gravity.TOP;
             menuIcon.setLayoutParams(menuParams);
             card.addView(menuIcon);
 

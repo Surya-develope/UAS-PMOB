@@ -63,6 +63,9 @@
             android:name=".EditPendidikanActivity"
             android:exported="false" />
         <activity
+            android:name=".HasilKuisActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

@@ -3,6 +3,18 @@
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
         android:title="Home" />
+    <item
+        android:id="@+id/nav_kuis"
+        android:icon="@drawable/ic_kuis"
+        android:title="Kuis" />
+    <item
+        android:id="@+id/nav_jawab_soal"
+        android:icon="@drawable/ic_jawab_soal"
+        android:title="Jawab Soal" />
+    <item
+        android:id="@+id/nav_hasil_kuis"
+        android:icon="@drawable/ic_hasil"
+        android:title="Hasil Kuis" />
     
 </menu>
 
