@@ -1,7 +1,7 @@
 package com.example.brainquiz.network;
 
-import com.example.brainquiz.LoginRequest;
-import com.example.brainquiz.TingkatanResponse;
+import com.example.brainquiz.models.LoginRequest;
+import com.example.brainquiz.models.TingkatanResponse;
 import com.example.brainquiz.filter.Kategori;
 import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Pendidikan;
@@ -10,13 +10,13 @@ import com.example.brainquiz.filter.Kuis;
 import com.example.brainquiz.filter.Soal;
 import com.example.brainquiz.filter.Jawaban;
 import com.example.brainquiz.models.User;
-import com.example.brainquiz.KategoriResponse;
-import com.example.brainquiz.KelasResponse;
-import com.example.brainquiz.PendidikanResponse;
-import com.example.brainquiz.KuisResponse;
-import com.example.brainquiz.SoalResponse;
-import com.example.brainquiz.JawabanResponse;
-import com.example.brainquiz.HasilKuisResponse;
+import com.example.brainquiz.models.KategoriResponse;
+import com.example.brainquiz.models.KelasResponse;
+import com.example.brainquiz.models.PendidikanResponse;
+import com.example.brainquiz.models.KuisResponse;
+import com.example.brainquiz.models.SoalResponse;
+import com.example.brainquiz.models.JawabanResponse;
+import com.example.brainquiz.models.HasilKuisResponse;
 
 import java.util.List;
 

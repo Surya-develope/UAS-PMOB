@@ -16,58 +16,58 @@
         android:theme="@style/Theme.QuizzApp"
         tools:targetApi="31">
         <activity
-            android:name=".HomeActivity"
+            android:name=".activities.HomeActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activities.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".TingkatanActivity"
+            android:name=".activities.TingkatanActivity"
             android:exported="false" />
         <activity
-            android:name=".KategoriActivity"
+            android:name=".activities.KategoriActivity"
             android:exported="false" />
         <activity
-            android:name=".KelasActivity"
+            android:name=".activities.KelasActivity"
             android:exported="false" />
         <activity
-            android:name=".PendidikanActivity"
+            android:name=".activities.PendidikanActivity"
             android:exported="false" />
         <activity
-            android:name=".KuisActivity"
+            android:name=".activities.KuisActivity"
             android:exported="false" />
         <activity
-            android:name=".TambahPendidikanActivity"
+            android:name=".activities.TambahPendidikanActivity"
             android:exported="false" />
         <activity
-            android:name=".TambahKelasActivity"
+            android:name=".activities.TambahKelasActivity"
             android:exported="false" />
         <activity
-            android:name=".TambahKategoriActivity"
+            android:name=".activities.TambahKategoriActivity"
             android:exported="false" />
         <activity
-            android:name=".TambahTingkatanActivity"
+            android:name=".activities.TambahTingkatanActivity"
             android:exported="false" />
         <activity
-            android:name=".TambahKuisActivity"
+            android:name=".activities.TambahKuisActivity"
             android:exported="false" />
         <activity
-            android:name=".EditActivity"
+            android:name=".activities.EditActivity"
             android:exported="false" />
         <activity
-            android:name=".EditKelasActivity"
+            android:name=".activities.EditKelasActivity"
             android:exported="false" />
         <activity
-            android:name=".EditKategoriActivity"
+            android:name=".activities.EditKategoriActivity"
             android:exported="false" />
         <activity
-            android:name=".EditPendidikanActivity"
+            android:name=".activities.EditPendidikanActivity"
             android:exported="false" />
         <activity
-            android:name=".HasilKuisActivity"
+            android:name=".activities.HasilKuisActivity"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".activities.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -75,34 +75,29 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".JawabSoalActivity"
+            android:name=".activities.JawabSoalActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activities.EditKuisActivity"
             android:exported="false" />
         <activity
-            android:name=".TestConnectionActivity"
+            android:name=".activities.KelolaSoalActivity"
             android:exported="false" />
         <activity
-            android:name=".TestTingkatanActivity"
+            android:name=".activities.TambahSoalActivity"
             android:exported="false" />
         <activity
-            android:name=".EditKuisActivity"
+            android:name=".activities.EditSoalActivity"
             android:exported="false" />
         <activity
-            android:name=".KelolaSoalActivity"
+            android:name=".activities.PilihKuisActivity"
             android:exported="false" />
         <activity
-            android:name=".TambahSoalActivity"
-            android:exported="false" />
-        <activity
-            android:name=".EditSoalActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PilihKuisActivity"
-            android:exported="false" />
-        <activity
-            android:name=".JawabSoalMainActivity"
+            android:name=".activities.JawabSoalMainActivity"
             android:exported="false" />
     </application>
 
