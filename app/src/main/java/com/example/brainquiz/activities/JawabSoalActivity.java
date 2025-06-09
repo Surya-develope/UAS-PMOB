@@ -34,8 +34,10 @@ import com.example.brainquiz.utils.ApiConstants;
 import com.example.brainquiz.utils.GsonHelper;
 import com.example.brainquiz.models.SoalResponse;
 import com.example.brainquiz.models.JawabanResponse;
+import com.example.brainquiz.helpers.QuizNavigationHelper;
+import com.example.brainquiz.helpers.QuizSubmissionHelper;
 
-public class JawabSoalActivity extends AppCompatActivity {
+public class JawabSoalActivity extends AppCompatActivity implements QuizSubmissionHelper.QuizSubmissionListener {
 
     private TextView tvKuisTitle, tvSoalNumber, tvQuestion, tvProgress;
     private RadioGroup rgOptions;
@@ -45,10 +47,11 @@ public class JawabSoalActivity extends AppCompatActivity {
 
     private ApiService apiService;
     private AuthManager authManager;
+    private QuizNavigationHelper navigationHelper;
+    private QuizSubmissionHelper submissionHelper;
 
     private List<Soal> soalList = new ArrayList<>();
     private List<String> jawabanUser = new ArrayList<>();
-    private int currentSoalIndex = 0;
     private int kuisId;
     private String kuisTitle;
 
@@ -60,6 +63,7 @@ public class JawabSoalActivity extends AppCompatActivity {
         initViews();
         initRetrofit();
         initAuthManager();
+        initHelpers();
         getIntentData();
         setupClickListeners();
 
@@ -104,6 +108,16 @@ public class JawabSoalActivity extends AppCompatActivity {
         authManager = AuthManager.getInstance(this);
     }
 
+    private void initHelpers() {
+        navigationHelper = new QuizNavigationHelper(
+            tvSoalNumber, tvQuestion, tvProgress, rgOptions,
+            rbA, rbB, rbC, rbD, btnPrevious, btnNext, btnSubmit
+        );
+
+        submissionHelper = new QuizSubmissionHelper(this, apiService, authManager);
+        submissionHelper.setListener(this);
+    }
+
     private void getIntentData() {
         Intent intent = getIntent();
         kuisId = intent.getIntExtra("kuis_id", 0);
@@ -117,13 +131,13 @@ public class JawabSoalActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        btnPrevious.setOnClickListener(v -> previousSoal());
-        btnNext.setOnClickListener(v -> nextSoal());
+        btnPrevious.setOnClickListener(v -> navigationHelper.previousSoal());
+        btnNext.setOnClickListener(v -> navigationHelper.nextSoal());
         btnSubmit.setOnClickListener(v -> showSubmitConfirmation());
 
         // Save answer when option is selected
         rgOptions.setOnCheckedChangeListener((group, checkedId) -> {
-            saveCurrentAnswer();
+            navigationHelper.saveCurrentAnswer();
         });
     }
 
@@ -170,8 +184,10 @@ public class JawabSoalActivity extends AppCompatActivity {
                             jawabanUser.add(""); // Empty answer initially
                         }
 
-                        displayCurrentSoal();
-                        updateNavigationButtons();
+                        // Setup navigation helper with data
+                        navigationHelper.setSoalData(soalList, jawabanUser);
+                        navigationHelper.displayCurrentSoal();
+                        navigationHelper.updateNavigationButtons();
 
                     } else {
                         Toast.makeText(JawabSoalActivity.this, "Gagal memuat soal: " + soalResponse.getMessage(), Toast.LENGTH_SHORT).show();
@@ -194,205 +210,34 @@ public class JawabSoalActivity extends AppCompatActivity {
         });
     }
 
-    private void displayCurrentSoal() {
-        if (soalList.isEmpty() || currentSoalIndex >= soalList.size()) return;
-
-        Soal currentSoal = soalList.get(currentSoalIndex);
-
-        // Update UI
-        tvSoalNumber.setText("Soal " + (currentSoalIndex + 1));
-        tvQuestion.setText(currentSoal.getQuestion());
-        tvProgress.setText((currentSoalIndex + 1) + " dari " + soalList.size());
-
-        // Set options
-        rbA.setText("A. " + currentSoal.getOptionA());
-        rbB.setText("B. " + currentSoal.getOptionB());
-        rbC.setText("C. " + currentSoal.getOptionC());
-        rbD.setText("D. " + currentSoal.getOptionD());
-
-        // Clear selection first
-        rgOptions.clearCheck();
-
-        // Set previous answer if exists
-        String previousAnswer = jawabanUser.get(currentSoalIndex);
-        if (!previousAnswer.isEmpty()) {
-            switch (previousAnswer) {
-                case "A":
-                    rbA.setChecked(true);
-                    break;
-                case "B":
-                    rbB.setChecked(true);
-                    break;
-                case "C":
-                    rbC.setChecked(true);
-                    break;
-                case "D":
-                    rbD.setChecked(true);
-                    break;
-            }
-        }
-
-        Log.d("JawabSoal", "Displaying soal " + (currentSoalIndex + 1) + ": " + currentSoal.getQuestion());
-    }
-
-    private void saveCurrentAnswer() {
-        if (currentSoalIndex >= jawabanUser.size()) return;
-
-        int selectedId = rgOptions.getCheckedRadioButtonId();
-        String answer = "";
-
-        if (selectedId == R.id.rbA) answer = "A";
-        else if (selectedId == R.id.rbB) answer = "B";
-        else if (selectedId == R.id.rbC) answer = "C";
-        else if (selectedId == R.id.rbD) answer = "D";
-
-        jawabanUser.set(currentSoalIndex, answer);
-        Log.d("JawabSoal", "Saved answer for soal " + (currentSoalIndex + 1) + ": " + answer);
-    }
-
-    private void previousSoal() {
-        if (currentSoalIndex > 0) {
-            saveCurrentAnswer();
-            currentSoalIndex--;
-            displayCurrentSoal();
-            updateNavigationButtons();
-        }
-    }
-
-    private void nextSoal() {
-        if (currentSoalIndex < soalList.size() - 1) {
-            saveCurrentAnswer();
-            currentSoalIndex++;
-            displayCurrentSoal();
-            updateNavigationButtons();
-        }
-    }
-
-    private void updateNavigationButtons() {
-        btnPrevious.setEnabled(currentSoalIndex > 0);
-        btnNext.setEnabled(currentSoalIndex < soalList.size() - 1);
-
-        // Show submit button on last question
-        if (currentSoalIndex == soalList.size() - 1) {
-            btnNext.setVisibility(View.GONE);
-            btnSubmit.setVisibility(View.VISIBLE);
-        } else {
-            btnNext.setVisibility(View.VISIBLE);
-            btnSubmit.setVisibility(View.GONE);
-        }
-    }
-
     private void showSubmitConfirmation() {
-        saveCurrentAnswer(); // Save current answer before checking
-
-        // Check for unanswered questions
-        int unansweredCount = 0;
-        for (String answer : jawabanUser) {
-            if (answer.isEmpty()) {
-                unansweredCount++;
-            }
-        }
-
-        String message = "Apakah Anda yakin ingin mengirim jawaban?";
-        if (unansweredCount > 0) {
-            message += "\n\nPeringatan: " + unansweredCount + " soal belum dijawab.";
-        }
-
-        new AlertDialog.Builder(this)
-                .setTitle("Konfirmasi Submit")
-                .setMessage(message)
-                .setPositiveButton("Ya, Kirim", (dialog, which) -> submitJawaban())
-                .setNegativeButton("Batal", null)
-                .show();
+        navigationHelper.saveCurrentAnswer(); // Save current answer before checking
+        submissionHelper.showSubmitConfirmation(jawabanUser, () -> submitJawaban());
     }
 
     private void submitJawaban() {
-        if (!authManager.hasValidToken()) {
-            Toast.makeText(this, ApiConstants.ERROR_UNAUTHORIZED, Toast.LENGTH_SHORT).show();
-            authManager.logoutAndRedirect(this);
-            return;
-        }
-
-        int userId = authManager.getCurrentUserId();
-
-        showLoading(true);
-
-        // Create jawaban list
-        List<Jawaban> jawabanList = new ArrayList<>();
-        for (int i = 0; i < soalList.size(); i++) {
-            Soal soal = soalList.get(i);
-            String answer = jawabanUser.get(i);
-
-            // Only add answered questions
-            if (!answer.isEmpty()) {
-                Jawaban jawaban = new Jawaban();
-                jawaban.setSoalId(soal.getId());
-                jawaban.setAnswer(answer);
-                jawaban.setUserId(userId);
-                jawabanList.add(jawaban);
-            }
-        }
-
-        Log.d("JawabSoal", "Submitting " + jawabanList.size() + " answers out of " + soalList.size() + " questions");
-
-        apiService.submitJawaban(authManager.getAuthorizationHeader(), jawabanList).enqueue(new Callback<JawabanResponse>() {
-            @Override
-            public void onResponse(Call<JawabanResponse> call, Response<JawabanResponse> response) {
-                showLoading(false);
-                Log.d("JawabSoal", "Submit response code: " + response.code());
-
-                if (response.isSuccessful() && response.body() != null) {
-                    JawabanResponse jawabanResponse = response.body();
-                    if (jawabanResponse.isSuccess()) {
-                        showResultDialog(jawabanResponse);
-                    } else {
-                        Toast.makeText(JawabSoalActivity.this, "Gagal mengirim jawaban: " + jawabanResponse.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.e("JawabSoal", "Submit error " + response.code());
-                    if (response.errorBody() != null) {
-                        try {
-                            Log.e("JawabSoal", "Error Body: " + response.errorBody().string());
-                        } catch (Exception e) {
-                            Log.e("JawabSoal", "Error reading error body: " + e.getMessage());
-                        }
-                    }
-                    Toast.makeText(JawabSoalActivity.this, "Gagal mengirim jawaban: " + response.code(), Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JawabanResponse> call, Throwable t) {
-                showLoading(false);
-                Log.e("JawabSoal", "Submit failure: " + t.getMessage(), t);
-                Toast.makeText(JawabSoalActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        submissionHelper.submitJawaban(soalList, jawabanUser);
     }
 
-    private void showResultDialog(JawabanResponse response) {
-        String resultMessage = "Jawaban berhasil dikirim!\n\n";
+    // QuizSubmissionListener implementation
+    @Override
+    public void onSubmissionStart() {
+        showLoading(true);
+    }
 
-        if (response.getScore() != null) {
-            resultMessage += "Skor: " + response.getScore();
-        }
+    @Override
+    public void onSubmissionComplete() {
+        showLoading(false);
+    }
 
-        if (response.getCorrectAnswers() != null && response.getTotalQuestions() != null) {
-            resultMessage += "\nBenar: " + response.getCorrectAnswers() + " dari " + response.getTotalQuestions();
-        }
+    @Override
+    public void onSubmissionSuccess(JawabanResponse response) {
+        submissionHelper.showResultDialog(response);
+    }
 
-        new AlertDialog.Builder(this)
-                .setTitle("Hasil Kuis")
-                .setMessage(resultMessage)
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Go back to home or quiz list
-                    Intent intent = new Intent(JawabSoalActivity.this, com.example.brainquiz.activities.HomeActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
+    @Override
+    public void onSubmissionError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
 

@@ -32,16 +32,18 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import com.example.brainquiz.models.KuisResponse;
+import com.example.brainquiz.helpers.CardDisplayHelper;
 
 public class PilihKuisActivity extends AppCompatActivity {
 
     private EditText etSearch;
     private GridLayout gridKuis;
-    
+
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
-    
+
     private List<Kuis> kuisList = new ArrayList<>();
+    private CardDisplayHelper cardHelper;
 
     // Tidak lagi menggunakan array warna, akan menggunakan background drawable yang konsisten
 
@@ -59,6 +61,7 @@ public class PilihKuisActivity extends AppCompatActivity {
     private void initViews() {
         etSearch = findViewById(R.id.etSearch);
         gridKuis = findViewById(R.id.gridKuis);
+        cardHelper = new CardDisplayHelper(this);
     }
 
     private void initRetrofit() {
@@ -131,28 +134,10 @@ public class PilihKuisActivity extends AppCompatActivity {
     }
 
     private void displayKuis(List<Kuis> kuisListToShow) {
-        gridKuis.removeAllViews();
-        gridKuis.setColumnCount(2);
-
-        final float density = getResources().getDisplayMetrics().density;
-        int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        int cardWidth = (screenWidth / 2) - (int)(32 * density); // Sama seperti card pendidikan
+        cardHelper.setupGrid(gridKuis);
 
         if (kuisListToShow.isEmpty()) {
-            // Show empty state
-            TextView emptyText = new TextView(this);
-            emptyText.setText("Tidak ada kuis ditemukan.\nCoba kata kunci lain.");
-            emptyText.setTextSize(16);
-            emptyText.setTextColor(Color.GRAY);
-            emptyText.setGravity(Gravity.CENTER);
-            emptyText.setPadding(32, 64, 32, 64);
-            
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.columnSpec = GridLayout.spec(0, 2); // Span 2 columns
-            params.width = GridLayout.LayoutParams.MATCH_PARENT;
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            emptyText.setLayoutParams(params);
-            
+            TextView emptyText = cardHelper.createNoDataMessage("Tidak ada kuis ditemukan.\nCoba kata kunci lain.");
             gridKuis.addView(emptyText);
             return;
         }
@@ -160,99 +145,9 @@ public class PilihKuisActivity extends AppCompatActivity {
         for (Kuis kuisItem : kuisListToShow) {
             if (kuisItem == null) continue;
 
-            // Container Card
-            LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(Gravity.CENTER);
-            card.setPadding(
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density)
-            );
-
-            // Set background menggunakan drawable yang konsisten seperti card lainnya
-            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
-
-            // Add elevation untuk konsistensi
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                card.setElevation(4 * density);
-            }
-
-            // Layout Parameters - sama seperti card pendidikan
-            GridLayout.LayoutParams cardParams = new GridLayout.LayoutParams();
-            cardParams.width = cardWidth;
-            cardParams.height = (int)(160 * density); // Fixed height yang sama dengan pendidikan
-            cardParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
-            cardParams.setMargins(
-                    (int) (8 * density),
-                    (int) (8 * density),
-                    (int) (8 * density),
-                    (int) (8 * density)
-            );
-            card.setLayoutParams(cardParams);
-
-            // Create a layout for the icon and text
-            LinearLayout contentLayout = new LinearLayout(this);
-            contentLayout.setOrientation(LinearLayout.VERTICAL);
-            contentLayout.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            contentLayout.setLayoutParams(contentParams);
-
-            // ImageView
-            ImageView icon = new ImageView(this);
-            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(
-                    (int) (64 * density),
-                    (int) (64 * density)
-            );
-            iconParams.gravity = Gravity.CENTER;
-            icon.setLayoutParams(iconParams);
-            try {
-                icon.setImageResource(R.drawable.question);
-            } catch (Exception e) {
-                Log.e("PilihKuis", "Error setting question drawable: " + e.getMessage());
-            }
-            icon.setColorFilter(Color.WHITE);
-            contentLayout.addView(icon);
-
-            // TextView for title
-            TextView tvTitle = new TextView(this);
-            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            textParams.gravity = Gravity.CENTER;
-            textParams.topMargin = (int) (12 * density);
-            tvTitle.setLayoutParams(textParams);
-
-            String title = kuisItem.getTitle();
-            tvTitle.setText(title != null ? title : "Kuis Tanpa Judul");
-            tvTitle.setTextColor(Color.WHITE);
-            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            tvTitle.setTypeface(null, Typeface.BOLD);
-            contentLayout.addView(tvTitle);
-
-            // Description
-            if (kuisItem.getDescription() != null && !kuisItem.getDescription().isEmpty()) {
-                TextView tvDescription = new TextView(this);
-                LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                descParams.gravity = Gravity.CENTER;
-                descParams.topMargin = (int) (4 * density);
-                tvDescription.setLayoutParams(descParams);
-                tvDescription.setText(kuisItem.getDescription());
-                tvDescription.setTextColor(Color.parseColor("#E0E0E0"));
-                tvDescription.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-                tvDescription.setMaxLines(2);
-                tvDescription.setEllipsize(android.text.TextUtils.TruncateAt.END);
-                contentLayout.addView(tvDescription);
-            }
-
+            // Buat card menggunakan CardDisplayHelper yang konsisten
+            LinearLayout card = cardHelper.createCard();
+            LinearLayout contentLayout = cardHelper.createContentLayout(R.drawable.question, kuisItem.getTitle());
             card.addView(contentLayout);
 
             // Set click listener to start quiz
