@@ -1,56 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="#F5F5F5">
 
     <!-- Header -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/header_card"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:cardElevation="4dp">
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="#9C27B0"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_hasil"
+            android:tint="#FFFFFF"
+            android:layout_marginEnd="12dp" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@color/purple_500"
-            android:gravity="center"
-            android:padding="16dp"
+            android:layout_weight="1"
             android:text="Hasil Kuis"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </androidx.cardview.widget.CardView>
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
 
-    <!-- Main Content -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_hasil"
+    </LinearLayout>
+
+    <!-- Content -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_margin="8dp"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-        app:layout_constraintTop_toBottomOf="@id/header_card" />
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <!-- No Data Text -->
-    <TextView
-        android:id="@+id/tv_no_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="Belum ada data hasil kuis"
-        android:textColor="#757575"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!-- Search -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Cari hasil kuis...">
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1"
+                android:drawableStart="@drawable/question"
+                android:drawablePadding="12dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Hasil Grid -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <GridLayout
+                android:id="@+id/gridHasil"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="1"
+                android:alignmentMode="alignMargins"
+                android:useDefaultMargins="false">
+
+                <!-- Hasil cards will be added dynamically -->
+
+            </GridLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
 
     <!-- Bottom Navigation -->
     <LinearLayout
@@ -60,8 +88,7 @@
         android:background="@android:color/white"
         android:elevation="8dp"
         android:orientation="horizontal"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:padding="8dp">
 
         <LinearLayout
             android:id="@+id/nav_home"
@@ -158,4 +185,4 @@
         </LinearLayout>
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

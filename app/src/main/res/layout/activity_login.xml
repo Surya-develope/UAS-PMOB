@@ -87,6 +87,14 @@
                 android:backgroundTint="#2196F3"
                 android:textColor="#FFFFFF"
                 android:padding="12dp"
+                android:layout_marginBottom="8dp" />
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
                 android:layout_marginBottom="16dp" />
 
             <LinearLayout
@@ -112,6 +120,17 @@
                     android:clickable="true"
                     android:focusable="true" />
             </LinearLayout>
+
+            <!-- Test Connection Button -->
+            <Button
+                android:id="@+id/btnTestConnection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Test Server Connection"
+                android:backgroundTint="#FF9800"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="16dp"
+                android:padding="8dp" />
 
         </LinearLayout>
     </RelativeLayout>

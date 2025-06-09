@@ -81,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         navJawabSoal.setOnClickListener(v -> {
-            startActivity(new Intent(this, JawabSoalActivity.class));
+            startActivity(new Intent(this, JawabSoalMainActivity.class));
         });
 
         navHasil.setOnClickListener(v -> {
