@@ -126,15 +126,36 @@ public class LoginActivity extends AppCompatActivity {
                     String message = jsonResponse.getString("message");
 
                     if (success) {
-                        // Ambil data dari objek "data" yang berisi token
+                        // Ambil data dari objek "data" yang berisi token dan user info
                         JSONObject data = jsonResponse.getJSONObject("data");
                         String token = data.getString("token");
 
-                        // Menyimpan token ke SharedPreferences
-                        saveToken(token);
+                        // Coba ambil user_id jika ada
+                        int userId = 0;
+                        if (data.has("user_id")) {
+                            userId = data.getInt("user_id");
+                        } else if (data.has("user")) {
+                            // Jika user_id ada di dalam objek user
+                            JSONObject user = data.getJSONObject("user");
+                            if (user.has("id")) {
+                                userId = user.getInt("id");
+                            } else if (user.has("ID")) {
+                                userId = user.getInt("ID");
+                            }
+                        }
 
-                        // Log token untuk debugging
-                        Log.d("LoginResponse", "Login successful! Token saved.");
+                        // Menyimpan token dan user_id ke SharedPreferences
+                        saveLoginData(token, userId);
+
+                        // Log untuk debugging
+                        Log.d("LoginResponse", "Login successful! Token and User ID saved.");
+                        Log.d("LoginResponse", "User ID: " + userId);
+
+                        // Warning jika user_id tidak ditemukan
+                        if (userId == 0) {
+                            Log.w("LoginResponse", "Warning: User ID not found in response. Using default ID.");
+                            Toast.makeText(LoginActivity.this, "Login berhasil (User ID tidak ditemukan)", Toast.LENGTH_SHORT).show();
+                        }
 
                         // Menangani login sukses
                         Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
@@ -199,13 +220,18 @@ public class LoginActivity extends AppCompatActivity {
         AppSingleton.getInstance(this).addToRequestQueue(request);
     }
 
-    // Menyimpan token setelah login berhasil
-    private void saveToken(String token) {
-        Log.d("saveToken", "Token disimpan: " + token);
+    // Menyimpan token dan user_id setelah login berhasil
+    private void saveLoginData(String token, int userId) {
+        Log.d("saveLoginData", "Token disimpan: " + token);
+        Log.d("saveLoginData", "User ID disimpan: " + userId);
+
         SharedPreferences sharedPreferences = getSharedPreferences("MyApp", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("token", token);
+        editor.putInt("user_id", userId);
         editor.apply();
+
+        Log.d("saveLoginData", "Login data saved successfully");
     }
 
     // Method untuk menampilkan/menyembunyikan loading

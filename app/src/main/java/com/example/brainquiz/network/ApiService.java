@@ -6,11 +6,17 @@ import com.example.brainquiz.filter.Kategori;
 import com.example.brainquiz.filter.Kelas;
 import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.filter.Tingkatan;
+import com.example.brainquiz.filter.Kuis;
+import com.example.brainquiz.filter.Soal;
+import com.example.brainquiz.filter.Jawaban;
 import com.example.brainquiz.models.User;
 import com.example.brainquiz.KategoriResponse;
 import com.example.brainquiz.KelasResponse;
 import com.example.brainquiz.PendidikanResponse;
 import com.example.brainquiz.KuisResponse;
+import com.example.brainquiz.SoalResponse;
+import com.example.brainquiz.JawabanResponse;
+import com.example.brainquiz.HasilKuisResponse;
 
 import java.util.List;
 
@@ -23,6 +29,9 @@ import retrofit2.http.Header;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+
+import java.util.List;
 
 public interface ApiService {
 
@@ -83,6 +92,47 @@ public interface ApiService {
     @PATCH("kelas/update-kelas/{id}")
     Call<KelasResponse> updateKelas(@Header("Authorization") String token, @Path("id") int id, @Body Kelas kelas);
 
+    // Kuis endpoints
     @GET("kuis/get-kuis")
     Call<KuisResponse> getKuis(@Header("Authorization") String token);
+
+    @POST("kuis/add-kuis")
+    Call<KuisResponse> addKuis(@Header("Authorization") String token, @Body Kuis kuis);
+
+    @PATCH("kuis/update-kuis/{id}")
+    Call<KuisResponse> updateKuis(@Header("Authorization") String token, @Path("id") int id, @Body Kuis kuis);
+
+    @DELETE("kuis/delete-kuis/{id}")
+    Call<Void> deleteKuis(@Header("Authorization") String token, @Path("id") int id);
+
+    @GET("kuis/filter-kuis")
+    Call<KuisResponse> filterKuis(@Header("Authorization") String token,
+                                  @Query("kategori_id") Integer kategoriId,
+                                  @Query("tingkatan_id") Integer tingkatanId);
+
+    // Soal endpoints
+    @GET("soal/get-soal")
+    Call<SoalResponse> getAllSoal(@Header("Authorization") String token);
+
+    @GET("soal/get-soal/{kuis_id}")
+    Call<SoalResponse> getSoalByKuisId(@Header("Authorization") String token, @Path("kuis_id") int kuisId);
+
+    @POST("soal/add-soal")
+    Call<SoalResponse> addSoal(@Header("Authorization") String token, @Body Soal soal);
+
+    @PATCH("soal/update-soal/{id}")
+    Call<SoalResponse> updateSoal(@Header("Authorization") String token, @Path("id") int id, @Body Soal soal);
+
+    @DELETE("soal/delete-soal/{id}")
+    Call<Void> deleteSoal(@Header("Authorization") String token, @Path("id") int id);
+
+    // Jawaban endpoints
+    @POST("hasil-kuis/submit-jawaban")
+    Call<JawabanResponse> submitJawaban(@Header("Authorization") String token, @Body List<Jawaban> jawabanList);
+
+    // Hasil Kuis endpoints
+    @GET("hasil-kuis/{user_id}/{kuis_id}")
+    Call<HasilKuisResponse> getHasilKuis(@Header("Authorization") String token,
+                                         @Path("user_id") int userId,
+                                         @Path("kuis_id") int kuisId);
 }

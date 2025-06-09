@@ -35,12 +35,12 @@
                 android:layout_marginBottom="4dp" />
 
             <EditText
-                android:id="@+id/etNama"
+                android:id="@+id/etTitle"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:background="@drawable/bg_input_border"
                 android:paddingHorizontal="12dp"
-                android:hint="Masukkan nama"
+                android:hint="Masukkan judul kuis"
                 android:textColorHint="#999"
                 android:textColor="#000000"/>
 
@@ -53,29 +53,122 @@
                 android:layout_marginBottom="4dp" />
 
             <EditText
-                android:id="@+id/etDeskripsi"
+                android:id="@+id/etDescription"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:gravity="top"
                 android:background="@drawable/bg_input_border"
                 android:padding="12dp"
-                android:hint="Masukkan deskripsi"
+                android:hint="Masukkan deskripsi kuis"
                 android:textColorHint="#999"
                 android:inputType="textMultiLine"
                 android:textColor="#000000"/>
+
+            <!-- Kategori -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kategori"
+                android:textColor="#00796B"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerKategori"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_input_border" />
+
+            <!-- Tingkatan -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tingkatan"
+                android:textColor="#00796B"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerTingkatan"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_input_border" />
+
+            <!-- Kelas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Kelas"
+                android:textColor="#00796B"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerKelas"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_input_border" />
+
+            <!-- Pendidikan -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pendidikan"
+                android:textColor="#00796B"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="4dp" />
+
+            <Spinner
+                android:id="@+id/spinnerPendidikan"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_input_border" />
+
         </LinearLayout>
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnSimpan"
-            android:layout_width="120dp"
-            android:layout_height="40dp"
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="16dp" />
+
+        <!-- Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_marginTop="24dp"
-            android:layout_gravity="center_horizontal"
-            android:text="Simpan"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/bg_button_simpan"
-            android:backgroundTint="@null"
-            style="@style/Widget.AppCompat.Button" />
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnCancel"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="Batal"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_button_simpan"
+                android:backgroundTint="#757575"
+                style="@style/Widget.AppCompat.Button" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="Simpan Kuis"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_button_simpan"
+                android:backgroundTint="@null"
+                style="@style/Widget.AppCompat.Button" />
+
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

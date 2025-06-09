@@ -13,21 +13,40 @@
         android:gravity="center"
         android:padding="16dp">
 
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/question"
+            android:layout_marginBottom="24dp"
+            android:tint="#2196F3" />
+
         <TextView
-            android:text="Ini Halaman Jawab Soal"
+            android:text="Pilih Kuis untuk Dijawab"
             android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="#333333"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp" />
 
         <TextView
-            android:text="Fitur jawab soal akan segera tersedia"
+            android:text="Klik tombol di bawah untuk memilih kuis yang ingin Anda jawab"
             android:textSize="16sp"
             android:textColor="#666666"
-            android:layout_marginTop="16dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
+
+        <Button
+            android:id="@+id/btnPilihKuis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pilih Kuis"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFFFFF"
+            android:paddingHorizontal="32dp"
+            android:paddingVertical="12dp" />
 
     </LinearLayout>
 
