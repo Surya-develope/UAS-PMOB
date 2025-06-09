@@ -6,7 +6,7 @@ public class HasilKuis {
     @SerializedName("ID")
     private int id;
 
-    @SerializedName("user_id")
+    @SerializedName(value = "user_id", alternate = {"users_id"})
     private int userId;
 
     @SerializedName("kuis_id")
@@ -18,16 +18,16 @@ public class HasilKuis {
     @SerializedName("total_questions")
     private int totalQuestions;
 
-    @SerializedName("correct_answers")
+    @SerializedName(value = "correct_answers", alternate = {"correct_answer"})
     private int correctAnswers;
 
     @SerializedName("completed_at")
     private String completedAt;
 
-    @SerializedName("created_at")
+    @SerializedName(value = "created_at", alternate = {"CreatedAt"})
     private String createdAt;
 
-    @SerializedName("updated_at")
+    @SerializedName(value = "updated_at", alternate = {"UpdatedAt"})
     private String updatedAt;
 
     // Relasi dengan Kuis
@@ -87,7 +87,11 @@ public class HasilKuis {
     }
 
     public String getCompletedAt() {
-        return completedAt;
+        // Fallback ke updatedAt jika completedAt tidak ada
+        if (completedAt != null && !completedAt.isEmpty()) {
+            return completedAt;
+        }
+        return updatedAt;
     }
 
     public void setCompletedAt(String completedAt) {
@@ -121,7 +125,10 @@ public class HasilKuis {
     // Helper methods
     public String getKuisTitle() {
         try {
-            return kuis != null && kuis.getTitle() != null ? kuis.getTitle() : "Unknown Quiz";
+            if (kuis != null && kuis.getTitle() != null && !kuis.getTitle().isEmpty()) {
+                return kuis.getTitle();
+            }
+            return "Unknown Quiz";
         } catch (Exception e) {
             return "Unknown Quiz";
         }
@@ -129,7 +136,15 @@ public class HasilKuis {
 
     public double getPercentage() {
         try {
-            if (totalQuestions == 0) return 0.0;
+            // Jika total_questions tidak ada atau 0, coba hitung dari score
+            if (totalQuestions == 0) {
+                // Asumsi: jika score 25 dan correct_answer 1, maka mungkin ada 4 soal (25*1=25, max 100)
+                // Atau bisa juga score langsung dalam bentuk persentase
+                if (score > 0 && score <= 100) {
+                    return (double) score; // Score sudah dalam bentuk persentase
+                }
+                return 0.0;
+            }
             return (double) correctAnswers / totalQuestions * 100.0;
         } catch (Exception e) {
             return 0.0;

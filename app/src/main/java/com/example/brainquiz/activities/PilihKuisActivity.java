@@ -43,17 +43,7 @@ public class PilihKuisActivity extends AppCompatActivity {
     
     private List<Kuis> kuisList = new ArrayList<>();
 
-    // Array warna untuk card
-    private String[] cardColors = {
-        "#2196F3", // Blue
-        "#4CAF50", // Green
-        "#FF9800", // Orange
-        "#9C27B0", // Purple
-        "#F44336", // Red
-        "#00BCD4", // Cyan
-        "#795548", // Brown
-        "#607D8B"  // Blue Grey
-    };
+    // Tidak lagi menggunakan array warna, akan menggunakan background drawable yang konsisten
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +135,8 @@ public class PilihKuisActivity extends AppCompatActivity {
         gridKuis.setColumnCount(2);
 
         final float density = getResources().getDisplayMetrics().density;
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int cardWidth = (screenWidth / 2) - (int)(32 * density); // Sama seperti card pendidikan
 
         if (kuisListToShow.isEmpty()) {
             // Show empty state
@@ -165,7 +157,6 @@ public class PilihKuisActivity extends AppCompatActivity {
             return;
         }
 
-        int cardIndex = 0;
         for (Kuis kuisItem : kuisListToShow) {
             if (kuisItem == null) continue;
 
@@ -180,20 +171,19 @@ public class PilihKuisActivity extends AppCompatActivity {
                     (int) (16 * density)
             );
 
-            // Set background and styling - use different colors for variety
-            String cardColor = cardColors[cardIndex % cardColors.length];
-            card.setBackgroundColor(Color.parseColor(cardColor));
+            // Set background menggunakan drawable yang konsisten seperti card lainnya
+            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
-            // Add corner radius and elevation
+            // Add elevation untuk konsistensi
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                card.setElevation(8 * density);
-                card.setClipToOutline(true);
+                card.setElevation(4 * density);
             }
 
+            // Layout Parameters - sama seperti card pendidikan
             GridLayout.LayoutParams cardParams = new GridLayout.LayoutParams();
-            cardParams.width = 0;
-            cardParams.height = (int) (180 * density);
-            cardParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f);
+            cardParams.width = cardWidth;
+            cardParams.height = (int)(160 * density); // Fixed height yang sama dengan pendidikan
+            cardParams.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
             cardParams.setMargins(
                     (int) (8 * density),
                     (int) (8 * density),
@@ -275,7 +265,6 @@ public class PilihKuisActivity extends AppCompatActivity {
             });
 
             gridKuis.addView(card);
-            cardIndex++; // Increment for next card color
         }
     }
 

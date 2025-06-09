@@ -135,4 +135,8 @@ public interface ApiService {
     Call<HasilKuisResponse> getHasilKuis(@Header("Authorization") String token,
                                          @Path("user_id") int userId,
                                          @Path("kuis_id") int kuisId);
+
+    // Endpoint baru untuk mendapatkan semua hasil kuis user
+    @GET("hasil-kuis/my-results")
+    Call<HasilKuisResponse> getMyResults(@Header("Authorization") String token);
 }

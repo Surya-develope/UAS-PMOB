@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -74,7 +76,8 @@ public class TingkatanActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-
+        // Setup search listener
+        setupSearchListener();
 
         // Fetch initial data
         fetchTingkatan();
@@ -85,6 +88,21 @@ public class TingkatanActivity extends AppCompatActivity {
         super.onResume();
         // Refresh data when returning from TambahTingkatanActivity
         fetchTingkatan();
+    }
+
+    private void setupSearchListener() {
+        etCariTingkatan.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterTingkatan(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private String getToken() {
@@ -405,6 +423,17 @@ public class TingkatanActivity extends AppCompatActivity {
 
             Log.d("TingkatanActivity", "Updated - ID: " + tingkatanId + ", Nama: " + namaBaru);
         }
+    }
+
+    private void filterTingkatan(String query) {
+        List<Tingkatan> filteredList = new ArrayList<>();
+        for (Tingkatan tingkatan : tingkatanList) {
+            if (tingkatan == null || tingkatan.getNama() == null) continue;
+            if (tingkatan.getNama().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(tingkatan);
+            }
+        }
+        tampilantingkatan(filteredList);
     }
 }
 

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,7 @@ import com.example.brainquiz.filter.Pendidikan;
 import com.example.brainquiz.network.ApiService;
 import com.example.brainquiz.models.PendidikanResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -42,6 +45,7 @@ public class PendidikanActivity extends AppCompatActivity {
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
     private static final int REQUEST_CODE_EDIT = 100;
+    private List<Pendidikan> pendidikanList = new ArrayList<>(); // Simpan daftar pendidikan
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,9 @@ public class PendidikanActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Setup search listener
+        setupSearchListener();
+
         // Fetch initial data
         fetchPendidikan();
     }
@@ -79,6 +86,21 @@ public class PendidikanActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         fetchPendidikan();
+    }
+
+    private void setupSearchListener() {
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterPendidikan(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private String getToken() {
@@ -99,7 +121,11 @@ public class PendidikanActivity extends AppCompatActivity {
             public void onResponse(Call<PendidikanResponse> call, Response<PendidikanResponse> response) {
                 Log.d("PendidikanActivity", "Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    List<Pendidikan> pendidikanList = response.body().getData();
+                    List<Pendidikan> data = response.body().getData();
+                    pendidikanList.clear();
+                    if (data != null) {
+                        pendidikanList.addAll(data);
+                    }
                     if (pendidikanList.isEmpty()) {
                         Toast.makeText(PendidikanActivity.this, "Tidak ada pendidikan", Toast.LENGTH_SHORT).show();
                     } else {
@@ -326,6 +352,17 @@ public class PendidikanActivity extends AppCompatActivity {
 
             Log.d("PendidikanActivity", "Updated - ID: " + pendidikanId + ", Nama: " + namaBaru);
         }
+    }
+
+    private void filterPendidikan(String query) {
+        List<Pendidikan> filteredList = new ArrayList<>();
+        for (Pendidikan pendidikan : pendidikanList) {
+            if (pendidikan == null || pendidikan.getNama() == null) continue;
+            if (pendidikan.getNama().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(pendidikan);
+            }
+        }
+        tampilkanPendidikan(filteredList);
     }
 }
 

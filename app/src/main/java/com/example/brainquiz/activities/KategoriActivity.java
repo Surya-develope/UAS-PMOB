@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,7 @@ import com.example.brainquiz.filter.Kategori;
 import com.example.brainquiz.network.ApiService;
 import com.example.brainquiz.models.KategoriResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -42,6 +45,7 @@ public class KategoriActivity extends AppCompatActivity {
     private ApiService apiService;
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
     private static final int REQUEST_CODE_EDIT = 100;
+    private List<Kategori> kategoriList = new ArrayList<>(); // Simpan daftar kategori
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,9 @@ public class KategoriActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Setup search listener
+        setupSearchListener();
+
         // Fetch initial data
         fetchKategori();
     }
@@ -79,6 +86,21 @@ public class KategoriActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         fetchKategori();
+    }
+
+    private void setupSearchListener() {
+        searchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterKategori(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private String getToken() {
@@ -99,7 +121,11 @@ public class KategoriActivity extends AppCompatActivity {
             public void onResponse(Call<KategoriResponse> call, Response<KategoriResponse> response) {
                 Log.d("KategoriActivity", "Response Code: " + response.code());
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    List<Kategori> kategoriList = response.body().getData();
+                    List<Kategori> data = response.body().getData();
+                    kategoriList.clear();
+                    if (data != null) {
+                        kategoriList.addAll(data);
+                    }
                     if (kategoriList.isEmpty()) {
                         Toast.makeText(KategoriActivity.this, "Tidak ada kategori", Toast.LENGTH_SHORT).show();
                     } else {
@@ -325,6 +351,17 @@ public class KategoriActivity extends AppCompatActivity {
 
             Log.d("KategoriActivity", "Updated - ID: " + kategoriId + ", Nama: " + namaBaru);
         }
+    }
+
+    private void filterKategori(String query) {
+        List<Kategori> filteredList = new ArrayList<>();
+        for (Kategori kategori : kategoriList) {
+            if (kategori == null || kategori.getNama() == null) continue;
+            if (kategori.getNama().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(kategori);
+            }
+        }
+        tampilkanKategori(filteredList);
     }
 }
 
