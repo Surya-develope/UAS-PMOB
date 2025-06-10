@@ -20,7 +20,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.brainquiz.filter.HasilKuis;
-import com.example.brainquiz.filter.Kuis;
 import com.example.brainquiz.network.ApiService;
 
 import java.text.SimpleDateFormat;
@@ -34,7 +33,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import com.example.brainquiz.models.KuisResponse;
 import com.example.brainquiz.models.HasilKuisResponse;
 import com.example.brainquiz.utils.AuthManager;
 import com.example.brainquiz.utils.NetworkHelper;
@@ -51,7 +49,6 @@ public class HasilKuisActivity extends AppCompatActivity {
     private ApiService apiService;
     private AuthManager authManager;
 
-    private List<Kuis> kuisList = new ArrayList<>();
     private List<HasilKuis> hasilKuisList = new ArrayList<>();
 
     @Override
@@ -75,7 +72,7 @@ public class HasilKuisActivity extends AppCompatActivity {
             return;
         }
 
-        fetchKuisList();
+        fetchMyResults();
 
         // Test JSON parsing for HasilKuis response (for development only)
         // JsonTestHelper.testHasilKuisResponse();
@@ -115,206 +112,57 @@ public class HasilKuisActivity extends AppCompatActivity {
 
 
 
-    private void fetchKuisList() {
+    private void fetchMyResults() {
         if (!authManager.hasValidToken()) {
             Toast.makeText(this, ApiConstants.ERROR_UNAUTHORIZED, Toast.LENGTH_SHORT).show();
             authManager.logoutAndRedirect(this);
             return;
         }
 
-        Log.d("HasilKuis", "Fetching kuis list...");
+        Log.d("HasilKuis", "Fetching my results using single endpoint...");
 
-        apiService.getKuis(authManager.getAuthorizationHeader()).enqueue(new Callback<KuisResponse>() {
+        apiService.getMyResults(authManager.getAuthorizationHeader()).enqueue(new Callback<HasilKuisResponse>() {
             @Override
-            public void onResponse(Call<KuisResponse> call, Response<KuisResponse> response) {
-                Log.d("HasilKuis", "Kuis response code: " + response.code());
+            public void onResponse(Call<HasilKuisResponse> call, Response<HasilKuisResponse> response) {
+                Log.d("HasilKuis", "My results response code: " + response.code());
 
                 if (response.isSuccessful() && response.body() != null) {
-                    KuisResponse kuisResponse = response.body();
-                    if (kuisResponse.isSuccess()) {
-                        kuisList = kuisResponse.getData();
-                        Log.d("HasilKuis", "Loaded " + kuisList.size() + " kuis");
+                    HasilKuisResponse hasilResponse = response.body();
+                    if (hasilResponse.isSuccess()) {
+                        hasilKuisList = hasilResponse.getData();
+                        Log.d("HasilKuis", "Loaded " + hasilKuisList.size() + " hasil kuis");
 
-                        // Fetch hasil for each kuis
-                        fetchAllHasilKuis();
+                        // Langsung tampilkan hasil tanpa perlu multiple API calls
+                        displayHasil(hasilKuisList);
 
+                        if (hasilKuisList.isEmpty()) {
+                            Toast.makeText(HasilKuisActivity.this, "Belum ada hasil kuis tersedia", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(HasilKuisActivity.this, "Gagal memuat kuis: " + kuisResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(HasilKuisActivity.this, "Gagal memuat hasil kuis: " + hasilResponse.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Log.e("HasilKuis", "Error " + response.code());
-                    Toast.makeText(HasilKuisActivity.this, "Gagal mengambil data kuis: " + response.code(), Toast.LENGTH_SHORT).show();
+                    if (response.code() == 404) {
+                        // 404 berarti user belum pernah mengerjakan kuis
+                        hasilKuisList.clear();
+                        displayHasil(hasilKuisList);
+                        Toast.makeText(HasilKuisActivity.this, "Belum ada hasil kuis tersedia", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(HasilKuisActivity.this, "Gagal mengambil data hasil kuis: " + response.code(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             @Override
-            public void onFailure(Call<KuisResponse> call, Throwable t) {
+            public void onFailure(Call<HasilKuisResponse> call, Throwable t) {
                 Log.e("HasilKuis", "onFailure: " + t.getMessage(), t);
                 Toast.makeText(HasilKuisActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void fetchAllHasilKuis() {
-        hasilKuisList.clear();
-        int userId = authManager.getCurrentUserId();
-        String authHeader = authManager.getAuthorizationHeader();
 
-        if (kuisList.isEmpty()) {
-            displayHasil(hasilKuisList);
-            return;
-        }
-
-        // Counter untuk tracking completed requests
-        final int[] completedRequests = {0};
-        final int totalRequests = kuisList.size();
-
-        for (Kuis kuis : kuisList) {
-            Log.d("HasilKuis", "Checking hasil for kuis ID: " + kuis.getId() + " (" + kuis.getTitle() + ")");
-
-            try {
-                apiService.getHasilKuis(authHeader, userId, kuis.getId()).enqueue(new Callback<HasilKuisResponse>() {
-                    @Override
-                    public void onResponse(Call<HasilKuisResponse> call, Response<HasilKuisResponse> response) {
-                        try {
-                            completedRequests[0]++;
-
-                            Log.d("HasilKuis", "Response for kuis '" + kuis.getTitle() + "': " + response.code());
-
-                            if (response.isSuccessful()) {
-                                if (response.body() != null) {
-                                    try {
-                                        HasilKuisResponse hasilResponse = response.body();
-                                        Log.d("HasilKuis", "Response success: " + hasilResponse.isSuccess());
-                                        Log.d("HasilKuis", "Response message: " + hasilResponse.getMessage());
-
-                                        if (hasilResponse.getData() != null) {
-                                            Log.d("HasilKuis", "Data size: " + hasilResponse.getData().size());
-
-                                            if (hasilResponse.isSuccess() && !hasilResponse.getData().isEmpty()) {
-                                                // Add hasil kuis to list
-                                                hasilKuisList.addAll(hasilResponse.getData());
-                                                Log.d("HasilKuis", "✅ Added " + hasilResponse.getData().size() + " hasil for kuis: " + kuis.getTitle());
-
-                                                // Log detail hasil
-                                                for (HasilKuis hasil : hasilResponse.getData()) {
-                                                    Log.d("HasilKuis", "  - Hasil ID: " + hasil.getId() + ", Score: " + hasil.getScore() + ", Grade: " + hasil.getGrade());
-                                                }
-                                            } else {
-                                                Log.w("HasilKuis", "❌ No hasil data for kuis: " + kuis.getTitle());
-                                            }
-                                        } else {
-                                            Log.w("HasilKuis", "❌ Response data is null for kuis: " + kuis.getTitle());
-                                        }
-                                    } catch (Exception e) {
-                                        Log.e("HasilKuis", "❌ Error parsing response body for kuis '" + kuis.getTitle() + "': " + e.getMessage(), e);
-                                    }
-                                } else {
-                                    Log.w("HasilKuis", "❌ Response body is null for kuis: " + kuis.getTitle());
-                                }
-                            } else {
-                                Log.e("HasilKuis", "❌ Error response for kuis '" + kuis.getTitle() + "': " + response.code());
-
-                                // Handle specific error codes
-                                String errorMessage = "";
-                                switch (response.code()) {
-                                    case 500:
-                                        errorMessage = "Server Error (500) - Ada masalah di server";
-                                        Log.e("HasilKuis", "Server Error 500 for kuis ID: " + kuis.getId() + " with user ID: " + userId);
-                                        break;
-                                    case 404:
-                                        // 404 is expected when user hasn't taken the quiz yet
-                                        Log.d("HasilKuis", "No hasil found for kuis '" + kuis.getTitle() + "' (404 - user hasn't taken this quiz)");
-                                        errorMessage = "Belum ada hasil untuk kuis ini";
-                                        break;
-                                    case 401:
-                                        errorMessage = ApiConstants.ERROR_UNAUTHORIZED;
-                                        // Auto logout on 401
-                                        runOnUiThread(() -> authManager.logoutAndRedirect(HasilKuisActivity.this));
-                                        break;
-                                    case 403:
-                                        errorMessage = "Forbidden (403) - Akses ditolak";
-                                        break;
-                                    default:
-                                        errorMessage = "HTTP Error " + response.code();
-                                        break;
-                                }
-
-                                try {
-                                    if (response.errorBody() != null) {
-                                        String errorBody = response.errorBody().string();
-
-                                        // Only log error body for non-404 errors
-                                        if (response.code() != 404) {
-                                            Log.e("HasilKuis", "Error body: " + errorBody);
-                                        }
-
-                                        // Show detailed error for 500
-                                        if (response.code() == 500) {
-                                            Log.e("HasilKuis", "=== SERVER ERROR 500 DETAILS ===");
-                                            Log.e("HasilKuis", "Kuis ID: " + kuis.getId());
-                                            Log.e("HasilKuis", "User ID: " + userId);
-                                            Log.e("HasilKuis", "Full URL: /hasil-kuis/" + userId + "/" + kuis.getId());
-                                            Log.e("HasilKuis", "Error Response: " + errorBody);
-                                            Log.e("HasilKuis", "================================");
-                                        }
-                                    } else {
-                                        if (response.code() != 404) {
-                                            Log.e("HasilKuis", "No error body available for " + response.code());
-                                        }
-                                    }
-                                } catch (Exception e) {
-                                    Log.e("HasilKuis", "Error reading error body: " + e.getMessage());
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.e("HasilKuis", "❌ Unexpected error in onResponse for kuis '" + kuis.getTitle() + "': " + e.getMessage(), e);
-                        } finally {
-                            // If all requests completed, display results
-                            if (completedRequests[0] == totalRequests) {
-                                Log.d("HasilKuis", "=== ALL REQUESTS COMPLETED ===");
-                                Log.d("HasilKuis", "Total hasil found: " + hasilKuisList.size());
-                                runOnUiThread(() -> displayHasil(hasilKuisList));
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<HasilKuisResponse> call, Throwable t) {
-                        try {
-                            completedRequests[0]++;
-                            Log.e("HasilKuis", "❌ Network failure for kuis '" + kuis.getTitle() + "': " + t.getClass().getSimpleName() + " - " + t.getMessage(), t);
-
-                            // Log specific error types
-                            if (t instanceof java.lang.IllegalStateException) {
-                                Log.e("HasilKuis", "IllegalStateException details: " + t.getMessage());
-                                Log.e("HasilKuis", "This usually indicates a problem with response parsing or Retrofit configuration");
-                            }
-                        } catch (Exception e) {
-                            Log.e("HasilKuis", "❌ Error in onFailure handler: " + e.getMessage(), e);
-                        } finally {
-                            // If all requests completed, display results
-                            if (completedRequests[0] == totalRequests) {
-                                Log.d("HasilKuis", "=== ALL REQUESTS COMPLETED ===");
-                                Log.d("HasilKuis", "Total hasil found: " + hasilKuisList.size());
-                                runOnUiThread(() -> displayHasil(hasilKuisList));
-                            }
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                Log.e("HasilKuis", "❌ Error creating API call for kuis '" + kuis.getTitle() + "': " + e.getMessage(), e);
-                completedRequests[0]++;
-
-                // If all requests completed, display results
-                if (completedRequests[0] == totalRequests) {
-                    Log.d("HasilKuis", "=== ALL REQUESTS COMPLETED ===");
-                    Log.d("HasilKuis", "Total hasil found: " + hasilKuisList.size());
-                    runOnUiThread(() -> displayHasil(hasilKuisList));
-                }
-            }
-        }
-    }
 
     private void displayHasil(List<HasilKuis> hasilListToShow) {
         gridHasil.removeAllViews();
@@ -368,7 +216,7 @@ public class HasilKuisActivity extends AppCompatActivity {
                     (int) (16 * density),
                     (int) (16 * density)
             );
-            card.setBackgroundResource(R.drawable.bg_card_white);
+            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
 
             GridLayout.LayoutParams cardParams = new GridLayout.LayoutParams();
             cardParams.width = GridLayout.LayoutParams.MATCH_PARENT;
@@ -390,7 +238,7 @@ public class HasilKuisActivity extends AppCompatActivity {
             TextView tvTitle = new TextView(this);
             tvTitle.setText(hasil.getKuisTitle());
             tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-            tvTitle.setTextColor(Color.parseColor("#333333"));
+            tvTitle.setTextColor(Color.WHITE);
             tvTitle.setTypeface(null, android.graphics.Typeface.BOLD);
 
             LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
@@ -404,7 +252,7 @@ public class HasilKuisActivity extends AppCompatActivity {
             String dateStr = formatDate(hasil.getCompletedAt());
             tvDate.setText(dateStr);
             tvDate.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-            tvDate.setTextColor(Color.parseColor("#666666"));
+            tvDate.setTextColor(Color.parseColor("#E0E0E0"));
             headerLayout.addView(tvDate);
 
             card.addView(headerLayout);
@@ -418,7 +266,7 @@ public class HasilKuisActivity extends AppCompatActivity {
             TextView tvScore = new TextView(this);
             tvScore.setText("Skor: " + hasil.getScore());
             tvScore.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            tvScore.setTextColor(Color.parseColor("#2196F3"));
+            tvScore.setTextColor(Color.WHITE);
             tvScore.setTypeface(null, android.graphics.Typeface.BOLD);
 
             LinearLayout.LayoutParams scoreParams = new LinearLayout.LayoutParams(
@@ -431,7 +279,7 @@ public class HasilKuisActivity extends AppCompatActivity {
             TextView tvGrade = new TextView(this);
             tvGrade.setText("Nilai: " + hasil.getGrade());
             tvGrade.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            tvGrade.setTextColor(getGradeColor(hasil.getGrade()));
+            tvGrade.setTextColor(Color.WHITE);
             tvGrade.setTypeface(null, android.graphics.Typeface.BOLD);
             scoreLayout.addView(tvGrade);
 
@@ -439,13 +287,21 @@ public class HasilKuisActivity extends AppCompatActivity {
 
             // Details section
             TextView tvDetails = new TextView(this);
-            String details = String.format("Benar: %d dari %d soal (%.1f%%)",
-                    hasil.getCorrectAnswers(),
-                    hasil.getTotalQuestions(),
-                    hasil.getPercentage());
+            String details;
+            if (hasil.getTotalQuestions() > 0) {
+                details = String.format("Benar: %d dari %d soal (%.1f%%)",
+                        hasil.getCorrectAnswers(),
+                        hasil.getTotalQuestions(),
+                        hasil.getPercentage());
+            } else {
+                // Jika total_questions tidak ada, tampilkan info yang tersedia
+                details = String.format("Jawaban benar: %d | Persentase: %.1f%%",
+                        hasil.getCorrectAnswers(),
+                        hasil.getPercentage());
+            }
             tvDetails.setText(details);
             tvDetails.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvDetails.setTextColor(Color.parseColor("#666666"));
+            tvDetails.setTextColor(Color.parseColor("#E0E0E0"));
             tvDetails.setPadding(0, 0, 0, (int) (8 * density));
             card.addView(tvDetails);
 
@@ -453,8 +309,7 @@ public class HasilKuisActivity extends AppCompatActivity {
             TextView tvStatus = new TextView(this);
             tvStatus.setText(hasil.getStatus());
             tvStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvStatus.setTextColor(hasil.getStatus().equals("LULUS") ?
-                Color.parseColor("#4CAF50") : Color.parseColor("#F44336"));
+            tvStatus.setTextColor(Color.WHITE);
             tvStatus.setTypeface(null, android.graphics.Typeface.BOLD);
             card.addView(tvStatus);
 

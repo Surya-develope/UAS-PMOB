@@ -130,9 +130,7 @@ public interface ApiService {
     @POST("hasil-kuis/submit-jawaban")
     Call<JawabanResponse> submitJawaban(@Header("Authorization") String token, @Body List<Jawaban> jawabanList);
 
-    // Hasil Kuis endpoints
-    @GET("hasil-kuis/{user_id}/{kuis_id}")
-    Call<HasilKuisResponse> getHasilKuis(@Header("Authorization") String token,
-                                         @Path("user_id") int userId,
-                                         @Path("kuis_id") int kuisId);
+    // Endpoint baru untuk mendapatkan semua hasil kuis user
+    @GET("hasil-kuis/my-results")
+    Call<HasilKuisResponse> getMyResults(@Header("Authorization") String token);
 }

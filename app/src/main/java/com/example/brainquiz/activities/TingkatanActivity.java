@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -33,6 +35,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import com.example.brainquiz.models.TingkatanResponse;
+import com.example.brainquiz.helpers.CardDisplayHelper;
 
 public class TingkatanActivity extends AppCompatActivity {
 
@@ -44,6 +47,7 @@ public class TingkatanActivity extends AppCompatActivity {
     private EditText etCariTingkatan;
     private ApiService apiService;
     private List<Tingkatan> tingkatanList = new ArrayList<>(); // Simpan daftar tingkatan
+    private CardDisplayHelper cardHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +72,17 @@ public class TingkatanActivity extends AppCompatActivity {
                 .build();
         apiService = retrofit.create(ApiService.class);
 
+        // Initialize card helper
+        cardHelper = new CardDisplayHelper(this);
+
         // Set click listener for "Tambah Tingkatan" button
         btnTambahTingkatan.setOnClickListener(v -> {
             Intent intent = new Intent(TingkatanActivity.this, com.example.brainquiz.activities.TambahTingkatanActivity.class);
             startActivity(intent);
         });
 
-
+        // Setup search listener
+        setupSearchListener();
 
         // Fetch initial data
         fetchTingkatan();
@@ -85,6 +93,21 @@ public class TingkatanActivity extends AppCompatActivity {
         super.onResume();
         // Refresh data when returning from TambahTingkatanActivity
         fetchTingkatan();
+    }
+
+    private void setupSearchListener() {
+        etCariTingkatan.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterTingkatan(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     private String getToken() {
@@ -186,27 +209,11 @@ public class TingkatanActivity extends AppCompatActivity {
     private void tampilantingkatan(List<Tingkatan> listTingkatan) {
         Log.d("TingkatanActivity", "tampilantingkatan called with " + (listTingkatan != null ? listTingkatan.size() : "null") + " items");
 
-        gridTingkatan.removeAllViews();
-        gridTingkatan.setColumnCount(2);
-
-        final float density = getResources().getDisplayMetrics().density;
+        cardHelper.setupGrid(gridTingkatan);
 
         if (listTingkatan == null || listTingkatan.isEmpty()) {
             Log.w("TingkatanActivity", "No tingkatan to display");
-            // Tambahkan pesan "Tidak ada data" ke grid
-            TextView noDataText = new TextView(this);
-            noDataText.setText("Belum ada tingkatan.\nKlik 'Tambah Tingkatan' untuk menambah.");
-            noDataText.setTextSize(16);
-            noDataText.setTextColor(Color.GRAY);
-            noDataText.setGravity(Gravity.CENTER);
-            noDataText.setPadding(32, 64, 32, 64);
-
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.columnSpec = GridLayout.spec(0, 2); // Span 2 columns
-            params.width = GridLayout.LayoutParams.MATCH_PARENT;
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            noDataText.setLayoutParams(params);
-
+            TextView noDataText = cardHelper.createNoDataMessage("Belum ada tingkatan.\nKlik 'Tambah Tingkatan' untuk menambah.");
             gridTingkatan.addView(noDataText);
             return;
         }
@@ -217,148 +224,69 @@ public class TingkatanActivity extends AppCompatActivity {
             Tingkatan tingkatan = listTingkatan.get(index);
             Log.d("TingkatanActivity", "Creating card " + index + " for tingkatan: " + tingkatan.getNama());
 
-            // Container Card
-            LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(Gravity.CENTER);
+            // Buat card menggunakan CardDisplayHelper yang konsisten
+            LinearLayout card = cardHelper.createCard();
+            LinearLayout contentLayout = cardHelper.createContentLayout(R.drawable.ic_tingkatan, tingkatan.getNama());
 
-            // Layout Parameters
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 0;
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
-            params.setMargins(
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density)
-            );
-            card.setLayoutParams(params);
-
-            // Styling
-            card.setPadding(
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density)
-            );
-            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
-
-            // ImageView
-            ImageView icon = new ImageView(this);
-            icon.setLayoutParams(new LinearLayout.LayoutParams(
-                    (int) (48 * density),
-                    (int) (48 * density)
-            ));
-            icon.setImageResource(R.drawable.ic_tingkatan);
-            icon.setColorFilter(Color.WHITE);
-            card.addView(icon);
-
-            // TextView nama
-            TextView tvNama = new TextView(this);
-            tvNama.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
-            String nama = tingkatan.getNama() != null ? tingkatan.getNama() : "Nama tidak tersedia";
-            tvNama.setText(nama);
-            tvNama.setTextColor(Color.WHITE); // Pastikan kontras dengan latar belakang
-            tvNama.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-            tvNama.setPadding(0, (int) (8 * density), 0, 0);
-            card.addView(tvNama);
-
-            // Tambahkan tombol opsi (ikon tiga titik)
-            ImageView menuIcon = new ImageView(this);
-            menuIcon.setImageResource(R.drawable.ic_more_vert);
-            menuIcon.setColorFilter(Color.WHITE);
-            LinearLayout.LayoutParams menuParams = new LinearLayout.LayoutParams(
-                    (int) (24 * density),
-                    (int) (24 * density)
-            );
-            menuParams.gravity = Gravity.END;
-            menuParams.topMargin = (int) (8 * density);
-            menuIcon.setLayoutParams(menuParams);
-            card.addView(menuIcon);
-
-            // Custom dialog untuk opsi Edit dan Hapus
-            menuIcon.setOnClickListener(view -> {
-                Dialog dialog = new Dialog(TingkatanActivity.this);
-                dialog.setContentView(R.layout.dialog_menu);
-                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-
-                // Opsi Edit
-                LinearLayout itemEdit = dialog.findViewById(R.id.menu_edit);
-                if (itemEdit != null) {
-                    itemEdit.setOnClickListener(v -> {
-                        if (tingkatan.getId() != 0) {
-                            Intent intent = new Intent(TingkatanActivity.this, com.example.brainquiz.activities.EditActivity.class);
-                            intent.putExtra("tingkatanId", String.valueOf(tingkatan.getId()));
-                            intent.putExtra("tingkatanNama", tingkatan.getNama());
-                            intent.putExtra("tingkatanDeskripsi", tingkatan.getDescription());
-                            startActivityForResult(intent, REQUEST_CODE_EDIT);
-                            dialog.dismiss();
-                        } else {
-                            Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            // Tambahkan menu icon
+            ImageView menuIcon = cardHelper.createMenuIcon(tingkatan, tingkatan.getNama(), new CardDisplayHelper.CardActionListener() {
+                @Override
+                public void onEditClick(Object item) {
+                    Tingkatan t = (Tingkatan) item;
+                    if (t.getId() != 0) {
+                        Intent intent = new Intent(TingkatanActivity.this, com.example.brainquiz.activities.EditActivity.class);
+                        intent.putExtra("tingkatanId", String.valueOf(t.getId()));
+                        intent.putExtra("tingkatanNama", t.getNama());
+                        intent.putExtra("tingkatanDeskripsi", t.getDescription());
+                        startActivityForResult(intent, REQUEST_CODE_EDIT);
+                    } else {
+                        Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
-                // Opsi Hapus
-                LinearLayout itemHapus = dialog.findViewById(R.id.itemHapus);
-                if (itemHapus != null) {
-                    itemHapus.setOnClickListener(v -> {
-                        if (tingkatan.getId() != 0) {
-                            new AlertDialog.Builder(TingkatanActivity.this)
-                                    .setTitle("Konfirmasi Hapus")
-                                    .setMessage("Apakah Anda yakin ingin menghapus " + (tingkatan.getNama() != null ? tingkatan.getNama() : "tingkatan ini") + "?")
-                                    .setPositiveButton("Ya", (dialogConfirm, which) -> {
-                                        String token = getToken();
-                                        if (!token.isEmpty()) {
-                                            apiService.deleteTingkatan("Bearer " + token, tingkatan.getId()).enqueue(new Callback<Void>() {
-                                                @Override
-                                                public void onResponse(Call<Void> call, Response<Void> response) {
-                                                    if (response.isSuccessful()) {
-                                                        Toast.makeText(TingkatanActivity.this, "Tingkatan " + (tingkatan.getNama() != null ? tingkatan.getNama() : "") + " berhasil dihapus", Toast.LENGTH_SHORT).show();
-                                                        fetchTingkatan();
-                                                    } else {
-                                                        Toast.makeText(TingkatanActivity.this, "Gagal menghapus: " + response.code(), Toast.LENGTH_SHORT).show();
-                                                        Log.e("DeleteTingkatan", "Error Code: " + response.code());
-                                                        if (response.errorBody() != null) {
-                                                            try {
-                                                                Log.e("DeleteTingkatan", "Error Body: " + response.errorBody().string());
-                                                            } catch (Exception e) {
-                                                                Log.e("DeleteTingkatan", "Error reading error body: " + e.getMessage());
-                                                            }
-                                                        }
-                                                    }
-                                                }
+                @Override
+                public void onDeleteClick(Object item) {
+                    Tingkatan t = (Tingkatan) item;
+                    if (t.getId() != 0) {
+                        String token = getToken();
+                        if (!token.isEmpty()) {
+                            apiService.deleteTingkatan("Bearer " + token, t.getId()).enqueue(new Callback<Void>() {
+                                @Override
+                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                    if (response.isSuccessful()) {
+                                        Toast.makeText(TingkatanActivity.this, "Tingkatan " + (t.getNama() != null ? t.getNama() : "") + " berhasil dihapus", Toast.LENGTH_SHORT).show();
+                                        fetchTingkatan();
+                                    } else {
+                                        Toast.makeText(TingkatanActivity.this, "Gagal menghapus: " + response.code(), Toast.LENGTH_SHORT).show();
+                                        Log.e("DeleteTingkatan", "Error Code: " + response.code());
+                                    }
+                                }
 
-                                                @Override
-                                                public void onFailure(Call<Void> call, Throwable t) {
-                                                    Toast.makeText(TingkatanActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                                                    Log.e("DeleteTingkatan", "onFailure: " + t.getMessage(), t);
-                                                }
-                                            });
-                                        } else {
-                                            Toast.makeText(TingkatanActivity.this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
-                                        }
-                                        dialog.dismiss();
-                                    })
-                                    .setNegativeButton("Tidak", (dialogConfirm, which) -> dialogConfirm.dismiss())
-                                    .show();
+                                @Override
+                                public void onFailure(Call<Void> call, Throwable t) {
+                                    Toast.makeText(TingkatanActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                                    Log.e("DeleteTingkatan", "onFailure: " + t.getMessage(), t);
+                                }
+                            });
                         } else {
-                            Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TingkatanActivity.this, "Token tidak ditemukan", Toast.LENGTH_SHORT).show();
                         }
-                        dialog.dismiss();
-                    });
+                    } else {
+                        Toast.makeText(TingkatanActivity.this, "ID tingkatan tidak valid", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
-                dialog.show();
+                @Override
+                public void onDeleteSuccess() {
+                    fetchTingkatan();
+                }
             });
 
-            // Tambahkan tag untuk identifikasi card dan TextView
+            card.addView(contentLayout);
+            card.addView(menuIcon);
+
+            // Tambahkan tag untuk identifikasi card
             card.setTag(String.valueOf(tingkatan.getId()));
-            tvNama.setTag("nama_" + tingkatan.getId());
 
             // Add to Grid
             gridTingkatan.addView(card);
@@ -405,6 +333,17 @@ public class TingkatanActivity extends AppCompatActivity {
 
             Log.d("TingkatanActivity", "Updated - ID: " + tingkatanId + ", Nama: " + namaBaru);
         }
+    }
+
+    private void filterTingkatan(String query) {
+        List<Tingkatan> filteredList = new ArrayList<>();
+        for (Tingkatan tingkatan : tingkatanList) {
+            if (tingkatan == null || tingkatan.getNama() == null) continue;
+            if (tingkatan.getNama().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(tingkatan);
+            }
+        }
+        tampilantingkatan(filteredList);
     }
 }
 

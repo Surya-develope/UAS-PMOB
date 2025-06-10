@@ -35,6 +35,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import com.example.brainquiz.helpers.CardDisplayHelper;
 import com.example.brainquiz.models.KuisResponse;
 
 public class KuisActivity extends AppCompatActivity {
@@ -46,6 +47,7 @@ public class KuisActivity extends AppCompatActivity {
     private static final String BASE_URL = "https://brainquiz0.up.railway.app/";
     private static final int REQUEST_CODE_EDIT = 100;
     private List<Kuis> kuisList;
+    private CardDisplayHelper cardHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +73,9 @@ public class KuisActivity extends AppCompatActivity {
 
         // Initialize kuis list
         kuisList = new ArrayList<>();
+
+        // Initialize card helper
+        cardHelper = new CardDisplayHelper(this);
 
         // Set click listener for "Tambah Kuis" button
         btnTambahKuis.setOnClickListener(v -> {
@@ -156,138 +161,38 @@ public class KuisActivity extends AppCompatActivity {
     }
 
     private void displayKuis(List<Kuis> kuis) {
-        gridLayout.removeAllViews();
-        gridLayout.setColumnCount(2);
-
-        final float density = getResources().getDisplayMetrics().density;
-        int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        int cardWidth = (screenWidth / 2) - (int)(32 * density); // Adjust for better sizing
+        cardHelper.setupGrid(gridLayout);
 
         for (Kuis kuisItem : kuis) {
             if (kuisItem == null) continue;
 
-            // Container Card
-            LinearLayout card = new LinearLayout(this);
-            card.setOrientation(LinearLayout.VERTICAL);
-            card.setGravity(Gravity.CENTER);
+            // Buat card menggunakan CardDisplayHelper yang konsisten
+            LinearLayout card = cardHelper.createCard();
+            LinearLayout contentLayout = cardHelper.createContentLayout(R.drawable.question, kuisItem.getTitle());
 
-            // Layout Parameters
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = cardWidth;
-            params.height = (int)(160 * density); // Fixed height that looks good on most devices
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1);
-            params.setMargins(
-                    (int) (8 * density),
-                    (int) (8 * density),
-                    (int) (8 * density),
-                    (int) (8 * density)
-            );
-            card.setLayoutParams(params);
+            // Tambahkan menu icon untuk admin
+            ImageView menuIcon = cardHelper.createMenuIcon(kuisItem, kuisItem.getTitle(), new CardDisplayHelper.CardActionListener() {
+                @Override
+                public void onEditClick(Object item) {
+                    // Tidak digunakan untuk quiz, langsung ke menu
+                }
 
-            // Styling
-            card.setPadding(
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density),
-                    (int) (16 * density)
-            );
-            card.setBackgroundResource(R.drawable.bg_tingkatan_card);
+                @Override
+                public void onDeleteClick(Object item) {
+                    // Tidak digunakan untuk quiz, langsung ke menu
+                }
 
-            // Header with menu icon
-            LinearLayout headerLayout = new LinearLayout(this);
-            headerLayout.setOrientation(LinearLayout.HORIZONTAL);
-            headerLayout.setGravity(Gravity.CENTER_VERTICAL);
-            LinearLayout.LayoutParams headerParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            headerLayout.setLayoutParams(headerParams);
+                @Override
+                public void onDeleteSuccess() {
+                    // Tidak digunakan untuk quiz
+                }
+            });
 
-            // Spacer to push menu to right
-            LinearLayout spacer = new LinearLayout(this);
-            LinearLayout.LayoutParams spacerParams = new LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f
-            );
-            spacer.setLayoutParams(spacerParams);
-            headerLayout.addView(spacer);
-
-            // Menu icon
-            ImageView menuIcon = new ImageView(this);
-            menuIcon.setImageResource(R.drawable.ic_more_vert);
-            menuIcon.setColorFilter(Color.WHITE);
-            LinearLayout.LayoutParams menuParams = new LinearLayout.LayoutParams(
-                    (int) (24 * density),
-                    (int) (24 * density)
-            );
-            menuParams.setMargins((int) (8 * density), (int) (8 * density), (int) (8 * density), 0);
-            menuIcon.setLayoutParams(menuParams);
+            // Override menu click untuk menampilkan menu kuis
             menuIcon.setOnClickListener(v -> showKuisMenu(kuisItem));
-            headerLayout.addView(menuIcon);
-
-            card.addView(headerLayout);
-
-            // Create a layout for the icon and text
-            LinearLayout contentLayout = new LinearLayout(this);
-            contentLayout.setOrientation(LinearLayout.VERTICAL);
-            contentLayout.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams contentParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            contentLayout.setLayoutParams(contentParams);
-
-            // ImageView
-            ImageView icon = new ImageView(this);
-            LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(
-                    (int) (64 * density),
-                    (int) (64 * density)
-            );
-            iconParams.gravity = Gravity.CENTER;
-            icon.setLayoutParams(iconParams);
-            try {
-                icon.setImageResource(R.drawable.question);
-            } catch (Exception e) {
-                Log.e("KuisActivity", "Error setting question drawable: " + e.getMessage());
-            }
-            icon.setColorFilter(Color.WHITE);
-            contentLayout.addView(icon);
-
-            // TextView for title
-            TextView tvTitle = new TextView(this);
-            LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            textParams.gravity = Gravity.CENTER;
-            textParams.topMargin = (int) (12 * density);
-            tvTitle.setLayoutParams(textParams);
-
-            String title = kuisItem.getTitle();
-            tvTitle.setText(title != null ? title : "Kuis Tanpa Judul");
-            tvTitle.setTextColor(Color.WHITE);
-            tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-            tvTitle.setTypeface(null, Typeface.BOLD);
-            contentLayout.addView(tvTitle);
-
-            // Description
-            if (kuisItem.getDescription() != null && !kuisItem.getDescription().isEmpty()) {
-                TextView tvDescription = new TextView(this);
-                LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                );
-                descParams.gravity = Gravity.CENTER;
-                descParams.topMargin = (int) (4 * density);
-                tvDescription.setLayoutParams(descParams);
-                tvDescription.setText(kuisItem.getDescription());
-                tvDescription.setTextColor(Color.parseColor("#E0E0E0"));
-                tvDescription.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-                tvDescription.setMaxLines(2);
-                tvDescription.setEllipsize(android.text.TextUtils.TruncateAt.END);
-                contentLayout.addView(tvDescription);
-            }
 
             card.addView(contentLayout);
+            card.addView(menuIcon);
 
             // Click listener for card (Sementara hanya Toast)
             card.setOnClickListener(v -> {
